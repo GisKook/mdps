@@ -1,0 +1,25 @@
+syntax="proto3";
+package Report;
+
+import "param.proto";
+
+message ManageCommand {
+	enum CommandType {
+		CMT_INVALID          = 0x0000;  
+
+		// das->dps
+		CMT_REQ_REGISTER        = 0x0001;
+		CMT_REQ_LOGIN           = 0x0002;
+		
+		// dps->das
+		CMT_REP_REGISTER        = 0x8001;
+		CMT_REP_LOGIN           = 0x8002;
+
+	}
+	bytes   cpuid = 1;
+	uint64  tid = 2;
+	uint32  serial_number = 3; 
+	string  uuid = 4;
+	CommandType type = 5;
+	repeated Param paras = 6;
+}
