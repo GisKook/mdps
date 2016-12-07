@@ -7,12 +7,12 @@ message ControlCommand {
 	enum CommandType {
 		CMT_INVALID          = 0x0000;  
 
-		// dps->das
-		CMT_REQ_RESTART         = 0x0003;
+		CMT_REQ_RESTART        = 0x0003;
+		CMT_REP_RESTART        = 0x8003;
 		
 		// dps->das
-		CMT_REP_RESTART         = 0x8003;
 	}
+
 	string  uuid = 1;
 	uint64  tid = 2;
 	uint32  serial_number = 3; 

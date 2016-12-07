@@ -7,19 +7,20 @@ import (
 	"github.com/giskook/mdps/pb"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
 func RestartHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(r)
 
 	var jsonResult []byte
 	defer func() {
 		if x := recover(); x != nil {
 			jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_SERVER_FAILED})
+			fmt.Fprint(w, string(jsonResult))
 			log.Println("3")
 		}
-		log.Println("2")
-		fmt.Fprint(w, string(jsonResult))
 	}()
 
 	r.ParseForm()
@@ -55,7 +56,8 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 
 	if !ok {
 		chan_response = make(chan *Report.ControlCommand)
-		GetHttpServer().HttpRespones[chan_key] = chan_response
+		var once sync.Once
+		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
 	}
 
 	GetZmqServer().SendControlDown(req)
@@ -67,7 +69,7 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(jsonResult))
 
 		break
-	case <-time.After(time.Duration(conf.GetConf().Http.Timeout)):
+	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
 		close(chan_response)
 		delete(GetHttpServer().HttpRespones, chan_key)
 		jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_TIMEOUT})

@@ -17,9 +17,13 @@ func main() {
 	config, _ := conf.ReadConfig("./conf.json")
 	log.Println(config)
 
-	zmq_server := zmq_server.NewZmqServer()
-	zmq_server.Init(config.Zmq)
-	zmq_server.Run()
+	zeromq_server := zmq_server.NewZmqServer()
+	zeromq_server.Init(config.Zmq)
+	go zeromq_server.Run()
+
+	http_server := zmq_server.NewHttpServer(config.Http)
+	http_server.Init()
+	http_server.Start()
 	// catchs system signal
 	chSig := make(chan os.Signal)
 	signal.Notify(chSig, syscall.SIGINT, syscall.SIGTERM)

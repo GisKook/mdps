@@ -35,10 +35,8 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 type ControlCommand_CommandType int32
 
 const (
-	ControlCommand_CMT_INVALID ControlCommand_CommandType = 0
-	// dps->das
+	ControlCommand_CMT_INVALID     ControlCommand_CommandType = 0
 	ControlCommand_CMT_REQ_RESTART ControlCommand_CommandType = 3
-	// dps->das
 	ControlCommand_CMT_REP_RESTART ControlCommand_CommandType = 32771
 )
 

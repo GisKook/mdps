@@ -52,7 +52,7 @@ func NewZmqServer() *ZmqServer {
 		&ZmqServer{
 			Socket_Terminal_Manage_Up_Chan:    make(chan string),
 			Socket_Terminal_Manage_Down_Chan:  make(chan string),
-			Socket_Terminal_Control_Up_Chan:   make(chan string),
+			Socket_Terminal_Control_Up_Chan:   make(chan string, 20),
 			Socket_Terminal_Control_Down_Chan: make(chan string),
 			Socket_Terminal_Data_Up_Chan:      make(chan string),
 
@@ -77,11 +77,13 @@ func (s *ZmqServer) RecvManageUp() {
 func (s *ZmqServer) RecvControlUp() {
 	for {
 		p, _ := s.Socket_Terminal_Control_Up_Socket.Recv(0)
+		log.Println("recv control up from zmq")
 		s.Socket_Terminal_Control_Up_Chan <- p
 	}
 }
 
 func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
+	log.Println("SendControlDown")
 	uuid := command.Uuid
 	s.Socket_Terminal_Control_Down_Socket.Send(uuid, zmq.SNDMORE)
 
@@ -110,6 +112,7 @@ func (s *ZmqServer) Run() {
 		case t_m_u := <-s.Socket_Terminal_Manage_Up_Chan:
 			s.ProccessManageUp(t_m_u)
 		case t_c_u := <-s.Socket_Terminal_Control_Up_Chan:
+			log.Println("control recv chan")
 			s.ProccessControlUp(t_c_u)
 		}
 	}

@@ -1,14 +1,14 @@
 {
     "Http":{
-        "Addr":":8887",
+        "Addr":":8881",
         "Timeout":5
-    }
+    },
     "Zmq": {
         "TerminalManageUp":"tcp://*:1901",
-        "TerminalManageDown":"tcp://*1902",
+        "TerminalManageDown":"tcp://*:1902",
         "TerminalControlUp":"tcp://*:1903",
-        "TerminalControlDown":"tcp://*1904",
-        "TerminalDataUp":"tcp://*1905"
+        "TerminalControlDown":"tcp://*:1904",
+        "TerminalDataUp":"tcp://*:1905"
     },
 
     "Redis": {
@@ -16,6 +16,6 @@
         "MaxIdle":100,
         "IdleTimeOut":240,
         "Passwd":"",
-        "TranInterval":5
+        "TranInterval":20
     }
 }
