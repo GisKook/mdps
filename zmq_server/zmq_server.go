@@ -147,6 +147,14 @@ func (s *ZmqServer) ProccessControlUp(p string) {
 		switch command.Type {
 		case Report.ControlCommand_CMT_REP_RESTART:
 			s.ProccessControlRestart(command)
+		case Report.ControlCommand_CMT_REP_DATA_DOWNLOAD:
+			s.ProccessControlRepDataDownload(command)
+		case Report.ControlCommand_CMT_REP_DATA_QUERY:
+			s.ProccessControlRepDataQuery(command)
+		case Report.ControlCommand_CMT_REP_BATCH_ADD_MONITOR:
+			s.ProccessControlRepBatchAddMonitor(command)
+		case Report.ControlCommand_CMT_REP_BATCH_ADD_ALTER:
+			s.ProccessControlRepBatchAddAlter(command)
 		}
 	}
 }

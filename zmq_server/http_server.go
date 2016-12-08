@@ -25,6 +25,10 @@ func NewHttpServer(config *conf.HttpConf) *Http_server {
 
 func (server *Http_server) Init() {
 	http.HandleFunc(HTTP_RESTART, RestartHandler)
+	http.HandleFunc(HTTP_DATA_DOWNLOAD, DataDownloadHandler)
+	http.HandleFunc(HTTP_DATA_QUERY, DataQueryHandler)
+	http.HandleFunc(HTTP_BATCH_ADD_MONITOR, BatchAddMonitorHandler)
+	http.HandleFunc(HTTP_BATCH_ADD_ALTER, BatchAddAlterHandler)
 }
 
 func (server *Http_server) Start() {

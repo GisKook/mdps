@@ -62,16 +62,16 @@ const (
 	HTTP_BATCH_ADD_MONITOR_MONITORS_REGISTER_COUNT string = "register_count"
 
 	// batch add alter
-	HTTP_BATCH_ADD_ALERT                       string = "/plc/batch_add_alter"
-	HTTP_BATCH_ADD_ALERT_SERILA_PORT           string = "serial_port"
-	HTTP_BATCH_ADD_ALERT_COUNT                 string = "count"
-	HTTP_BATCH_ADD_ALERT_ALTERS                string = "alters"
-	HTTP_BATCH_ADD_ALERT_ALTERS_ID             string = "id"
-	HTTP_BATCH_ADD_ALERT_ALTERS_MODBUS_ADDR    string = "modbus_addr"
-	HTTP_BATCH_ADD_ALERT_ALTERS_REGISTER_TYPE  string = "register_type"
-	HTTP_BATCH_ADD_ALERT_ALTERS_REGISTER_COUNT string = "register_count"
-	HTTP_BATCH_ADD_ALERT_ALTERS_COND           string = "cond"
-	HTTP_BATCH_ADD_ALERT_ALTERS_THRESHOLD      string = "threshold"
+	HTTP_BATCH_ADD_ALTER                       string = "/plc/batch_add_alter"
+	HTTP_BATCH_ADD_ALTER_SERILA_PORT           string = "serial_port"
+	HTTP_BATCH_ADD_ALTER_COUNT                 string = "count"
+	HTTP_BATCH_ADD_ALTER_ALTERS                string = "alters"
+	HTTP_BATCH_ADD_ALTER_ALTERS_ID             string = "id"
+	HTTP_BATCH_ADD_ALTER_ALTERS_MODBUS_ADDR    string = "modbus_addr"
+	HTTP_BATCH_ADD_ALTER_ALTERS_REGISTER_TYPE  string = "register_type"
+	HTTP_BATCH_ADD_ALTER_ALTERS_REGISTER_COUNT string = "register_count"
+	HTTP_BATCH_ADD_ALTER_ALTERS_COND           string = "cond"
+	HTTP_BATCH_ADD_ALTER_ALTERS_THRESHOLD      string = "threshold"
 
 	//////////////RESPONSE////////////////
 	HTTP_RESPONSE_RESULT               string = "result"
@@ -79,4 +79,6 @@ const (
 	HTTP_RESPONSE_RESULT_SERVER_FAILED string = "1"
 	HTTP_RESPONSE_RESULT_PARAMTER_ERR  string = "2"
 	HTTP_RESPONSE_RESULT_TIMEOUT       string = "3"
+
+	HTTP_RESPONSE_SERIAL_PORT string = "serial_port"
 )

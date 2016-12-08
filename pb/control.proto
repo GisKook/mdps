@@ -9,8 +9,19 @@ message ControlCommand {
 
 		CMT_REQ_RESTART        = 0x0003;
 		CMT_REP_RESTART        = 0x8003;
+
+        CMT_REQ_DATA_DOWNLOAD  = 0x0007;
+        CMT_REP_DATA_DOWNLOAD  = 0x8007;
+
+        CMT_REQ_DATA_QUERY   = 0x0008;
+        CMT_REP_DATA_QUERY   = 0x8008;
+
+        CMT_REQ_BATCH_ADD_MONITOR = 0x0009;
+        CMT_REP_BATCH_ADD_MONITOR = 0x8009;
+
+        CMT_REQ_BATCH_ADD_ALTER = 0x000a;
+        CMT_REP_BATCH_ADD_ALTER = 0x800a;
 		
-		// dps->das
 	}
 
 	string  uuid = 1;
