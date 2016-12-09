@@ -43,7 +43,7 @@ var ManageCommand_CommandType_value = map[string]int32{
 func (x ManageCommand_CommandType) String() string {
 	return proto.EnumName(ManageCommand_CommandType_name, int32(x))
 }
-func (ManageCommand_CommandType) EnumDescriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 0} }
+func (ManageCommand_CommandType) EnumDescriptor() ([]byte, []int) { return fileDescriptor2, []int{0, 0} }
 
 type ManageCommand struct {
 	Cpuid        []byte                    `protobuf:"bytes,1,opt,name=cpuid,proto3" json:"cpuid,omitempty"`
@@ -57,7 +57,7 @@ type ManageCommand struct {
 func (m *ManageCommand) Reset()                    { *m = ManageCommand{} }
 func (m *ManageCommand) String() string            { return proto.CompactTextString(m) }
 func (*ManageCommand) ProtoMessage()               {}
-func (*ManageCommand) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (*ManageCommand) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
 
 func (m *ManageCommand) GetParas() []*Param {
 	if m != nil {
@@ -71,9 +71,9 @@ func init() {
 	proto.RegisterEnum("Report.ManageCommand_CommandType", ManageCommand_CommandType_name, ManageCommand_CommandType_value)
 }
 
-func init() { proto.RegisterFile("manage.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("manage.proto", fileDescriptor2) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor2 = []byte{
 	// 272 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x54, 0x90, 0xbd, 0x4e, 0xc3, 0x30,
 	0x10, 0x80, 0xc9, 0xaf, 0x84, 0x93, 0x40, 0x38, 0x10, 0x8a, 0x98, 0x4a, 0x59, 0x3a, 0x65, 0x28,

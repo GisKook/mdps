@@ -1,0 +1,36 @@
+syntax="proto3";
+package Report;
+
+message Monitor{
+	uint32 id = 1;
+        uint32 modus_addr = 2;
+	uint32 data_type = 3;
+	uint32 data_len = 4;
+	bytes data = 5;
+}
+
+message Alter{
+	uint32 id = 1;
+        uint32 modus_addr = 2;
+	uint32 data_type = 3;
+	uint32 data_len = 4;
+	bytes data = 5;
+	uint32 status = 6; 
+}
+
+message DataCommand {
+	enum CommandType {
+		CMT_INVALID          = 0x0000;  
+
+		// das->dps
+		CMT_REP_DATA_UPLOAD_MONITORS = 0x800b;
+		CMT_REP_DATA_UPLOAD_ALTERS   = 0x800c;
+		
+	}
+	string  uuid = 1;
+	uint64  tid = 2;
+	uint32  serial_number = 3; 
+	CommandType type = 5;
+	repeated Monitor monitors= 6;
+	repeated Alter alters = 7;
+}

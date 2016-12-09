@@ -7,11 +7,15 @@ Package Report is a generated protocol buffer package.
 
 It is generated from these files:
 	control.proto
+	data.proto
 	manage.proto
 	param.proto
 
 It has these top-level messages:
 	ControlCommand
+	Monitor
+	Alter
+	DataCommand
 	ManageCommand
 	Param
 */

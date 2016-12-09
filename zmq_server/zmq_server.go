@@ -82,6 +82,14 @@ func (s *ZmqServer) RecvControlUp() {
 	}
 }
 
+func (s *ZmqServer) RecvDataUp() {
+	for {
+		p, _ := s.Socket_Terminal_Data_Up_Socket.Recv(0)
+		log.Println("recv data up from zmq")
+		s.Socket_Terminal_Data_Up_Chan <- p
+	}
+}
+
 func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
 	log.Println("SendControlDown")
 	uuid := command.Uuid
@@ -105,6 +113,8 @@ func (s *ZmqServer) Run() {
 
 	go s.RecvManageUp()
 	go s.RecvControlUp()
+	go s.RecvDataUp()
+
 	for {
 		select {
 		case <-s.ExitChan:
@@ -114,6 +124,9 @@ func (s *ZmqServer) Run() {
 		case t_c_u := <-s.Socket_Terminal_Control_Up_Chan:
 			log.Println("control recv chan")
 			s.ProccessControlUp(t_c_u)
+		case t_d_u := <-s.Socket_Terminal_Data_Up_Chan:
+			log.Println("data recv chan")
+			s.ProccessDataUp(t_d_u)
 		}
 	}
 }
@@ -157,6 +170,23 @@ func (s *ZmqServer) ProccessControlUp(p string) {
 			s.ProccessControlRepBatchAddAlter(command)
 		}
 	}
+}
+
+func (s *ZmqServer) ProccessDataUp(p string) {
+	command := &Report.DataCommand{}
+	err := proto.Unmarshal([]byte(p), command)
+	if err != nil {
+		log.Println(err)
+	} else {
+		switch command.Type {
+		case Report.DataCommand_CMT_REP_DATA_UPLOAD_MONITORS:
+			s.ProccessDataRepDataUploadMonitors(command)
+		case Report.DataCommand_CMT_REP_DATA_UPLOAD_ALTERS:
+			s.ProccessDataRepDataUploadAlters(command)
+		}
+
+	}
+
 }
 
 //func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {

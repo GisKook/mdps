@@ -1,0 +1,6 @@
+syntax="proto3";
+package Report;
+
+message PLCStataus {
+	uint32 status = 1; // 0:online 1:offline 2:penetrate
+}

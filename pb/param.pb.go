@@ -53,7 +53,7 @@ var Param_ParaType_value = map[string]int32{
 func (x Param_ParaType) String() string {
 	return proto.EnumName(Param_ParaType_name, int32(x))
 }
-func (Param_ParaType) EnumDescriptor() ([]byte, []int) { return fileDescriptor2, []int{0, 0} }
+func (Param_ParaType) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{0, 0} }
 
 type Param struct {
 	Type    Param_ParaType `protobuf:"varint,1,opt,name=type,enum=Report.Param_ParaType" json:"type,omitempty"`
@@ -66,16 +66,16 @@ type Param struct {
 func (m *Param) Reset()                    { *m = Param{} }
 func (m *Param) String() string            { return proto.CompactTextString(m) }
 func (*Param) ProtoMessage()               {}
-func (*Param) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
+func (*Param) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
 func init() {
 	proto.RegisterType((*Param)(nil), "Report.Param")
 	proto.RegisterEnum("Report.Param_ParaType", Param_ParaType_name, Param_ParaType_value)
 }
 
-func init() { proto.RegisterFile("param.proto", fileDescriptor2) }
+func init() { proto.RegisterFile("param.proto", fileDescriptor3) }
 
-var fileDescriptor2 = []byte{
+var fileDescriptor3 = []byte{
 	// 226 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x34, 0x90, 0xc1, 0x4b, 0xc3, 0x30,
 	0x14, 0xc6, 0x4d, 0x97, 0xd4, 0xed, 0x29, 0xf2, 0x0c, 0x22, 0x3d, 0xce, 0x9d, 0xc4, 0x43, 0xc1,
