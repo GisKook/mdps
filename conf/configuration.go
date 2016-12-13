@@ -19,11 +19,13 @@ type ZmqConf struct {
 }
 
 type RedisConf struct {
-	Addr         string
-	MaxIdle      int
-	IdleTimeOut  int
-	Passwd       string
-	TranInterval int
+	Addr              string
+	MaxIdle           int
+	IdleTimeOut       int
+	Passwd            string
+	TranInterval      int
+	MonitorsKeyExpire uint32
+	AltersKeyExpire   uint32
 }
 
 type Configuration struct {

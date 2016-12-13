@@ -4,13 +4,12 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"github.com/golang/protobuf/proto"
 	"log"
 	"time"
 )
 
 type RedisSocket struct {
-	conf               *conf.RedisConfigure
+	conf               *conf.RedisConf
 	Pool               *redis.Pool
 	DataUploadMonitors []*Report.DataCommand
 	DataUploadAlters   []*Report.DataCommand
@@ -18,45 +17,54 @@ type RedisSocket struct {
 	ticker *time.Ticker
 }
 
-func NewRedisSocket(config *conf.RedisConfigure) (*RedisSocket, error) {
-	return &RedisSocket{
-		conf: config,
-		Pool: &redis.Pool{
-			MaxIdle:     config.MaxIdle,
-			IdleTimeout: time.Duration(config.IdleTimeOut) * time.Second,
-			Dial: func() (redis.Conn, error) {
-				c, err := redis.Dial("tcp", config.Addr)
-				if err != nil {
-					log.Println(err.Error())
-					return nil, err
-				}
+var G_RedisSocket *RedisSocket = nil
 
-				if len(config.Passwd) > 0 {
-					if _, err := c.Do("AUTH", config.Passwd); err != nil {
-						log.Println(err.Error())
-						c.Close()
-						return nil, err
-					}
-				}
+func NewRedisSocket(config *conf.RedisConf) (*RedisSocket, error) {
+	if G_RedisSocket == nil {
+		G_RedisSocket =
+			&RedisSocket{
+				conf: config,
+				Pool: &redis.Pool{
+					MaxIdle:     config.MaxIdle,
+					IdleTimeout: time.Duration(config.IdleTimeOut) * time.Second,
+					Dial: func() (redis.Conn, error) {
+						c, err := redis.Dial("tcp", config.Addr)
+						if err != nil {
+							log.Println(err.Error())
+							return nil, err
+						}
 
-				return c, err
-			},
-			TestOnBorrow: func(c redis.Conn, t time.Time) error {
-				if time.Since(t) < time.Minute {
-					return nil
-				}
+						if len(config.Passwd) > 0 {
+							if _, err := c.Do("AUTH", config.Passwd); err != nil {
+								log.Println(err.Error())
+								c.Close()
+								return nil, err
+							}
+						}
 
-				_, err := c.Do("PING")
+						return c, err
+					},
+					TestOnBorrow: func(c redis.Conn, t time.Time) error {
+						if time.Since(t) < time.Minute {
+							return nil
+						}
 
-				return err
-			},
-		},
-		DataUploadMonitors: make([]*Report.DataCommand, 0),
-		DataUploadAlters:   make([]*Report.DataCommand, 0),
-		ticker:             time.NewTicker(time.Duration(config.TranInterval) * time.Second),
-	}, nil
+						_, err := c.Do("PING")
+
+						return err
+					},
+				},
+				DataUploadMonitors: make([]*Report.DataCommand, 0),
+				DataUploadAlters:   make([]*Report.DataCommand, 0),
+				ticker:             time.NewTicker(time.Duration(config.TranInterval) * time.Second),
+			}
+	}
+	return G_RedisSocket, nil
 }
 
+func GetRedisSocket() *RedisSocket {
+	return G_RedisSocket
+}
 func (socket *RedisSocket) DoWork() {
 	defer func() {
 		socket.Close()
@@ -65,7 +73,8 @@ func (socket *RedisSocket) DoWork() {
 	for {
 		select {
 		case <-socket.ticker.C:
-			go socket.ProcessDataUploadMonitors()
+			go socket.ProccessDataUploadMonitors()
+			go socket.ProccessDataUploadAlters()
 		}
 	}
 }
@@ -78,13 +87,18 @@ func (socket *RedisSocket) Close() {
 	socket.ticker.Stop()
 }
 
-func (socket *RedisSocket) RecvNsqDataUpload(message []byte) {
-	data_upload := &Report.DataCommand{}
-	err := proto.Unmarshal(message, data_upload)
-	if err != nil {
-		log.Println("unmarshal error")
-	} else {
-		log.Printf("<IN NSQ> %s %d \n", data_upload.DasUuid, data_upload.Cpid)
-		socket.DataUpload = append(socket.DataUpload, data_upload)
-	}
+func (socket *RedisSocket) RecvZmqDataUploadMonitors(monitors *Report.DataCommand) {
+	//	monitors := &Report.DataCommand{}
+	//	err := proto.Unmarshal(message, monitors)
+	//	if err != nil {
+	//		log.Println("unmarshal error")
+	//	} else {
+	log.Printf("<IN ZMQ>  monitors %s %d \n", monitors.Uuid, monitors.Tid)
+	socket.DataUploadMonitors = append(socket.DataUploadMonitors, monitors)
+	//	}
+}
+
+func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
+	log.Printf("<IN ZMQ>  alters %s %d \n", alters.Uuid, alters.Tid)
+	socket.DataUploadAlters = append(socket.DataUploadAlters, alters)
 }
