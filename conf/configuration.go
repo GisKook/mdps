@@ -26,6 +26,7 @@ type RedisConf struct {
 	TranInterval      int
 	MonitorsKeyExpire uint32
 	AltersKeyExpire   uint32
+	StatusExpire      uint32
 }
 
 type Configuration struct {

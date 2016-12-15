@@ -10,6 +10,7 @@ It is generated from these files:
 	data.proto
 	manage.proto
 	param.proto
+	plc_status.proto
 
 It has these top-level messages:
 	ControlCommand
@@ -18,6 +19,7 @@ It has these top-level messages:
 	DataCommand
 	ManageCommand
 	Param
+	PLCStataus
 */
 package Report
 

@@ -14,10 +14,13 @@ const SEP_ALTERS_VALUE string = ","
 func (socket *RedisSocket) ProccessDataUploadAlters() {
 	conn := socket.GetConn()
 	defer conn.Close()
+	conn.Do("SELECT", 14)
 
 	for _, data_command := range socket.DataUploadAlters {
 		for _, alter := range data_command.Alters {
-			conn.Send("EXPIRE", alter.Id, conf.GetConf().Redis.AltersKeyExpire)
+			conn.Send("EXPIRE", PREFIX_ALTERS+
+				strconv.FormatUint(data_command.Tid, 10),
+				conf.GetConf().Redis.AltersKeyExpire)
 			reader := bytes.NewReader(alter.Data)
 			if alter.DataType == 0 {
 				var byte_value byte

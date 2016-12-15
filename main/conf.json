@@ -18,6 +18,7 @@
         "Passwd":"",
         "TranInterval":20,
         "MonitorsKeyExpire":20,
-        "AltersKeyExpire":20
+        "AltersKeyExpire":20,
+        "StatusExpire":20
     }
 }

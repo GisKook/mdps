@@ -4,6 +4,7 @@ import (
 	"fmt"
 	//zmq "github.com/pebbe/zmq3"
 	"github.com/giskook/mdps/conf"
+	"github.com/giskook/mdps/redis_socket"
 	"github.com/giskook/mdps/zmq_server"
 	"log"
 	"os"
@@ -24,6 +25,10 @@ func main() {
 	http_server := zmq_server.NewHttpServer(config.Http)
 	http_server.Init()
 	http_server.Start()
+
+	redis_server, _ := redis_socket.NewRedisSocket(config.Redis)
+	redis_server.DoWork()
+
 	// catchs system signal
 	chSig := make(chan os.Signal)
 	signal.Notify(chSig, syscall.SIGINT, syscall.SIGTERM)

@@ -8,11 +8,17 @@ import (
 	"time"
 )
 
+type TStatus struct {
+	Uuid   string
+	Status uint8
+}
+
 type RedisSocket struct {
 	conf               *conf.RedisConf
 	Pool               *redis.Pool
 	DataUploadMonitors []*Report.DataCommand
 	DataUploadAlters   []*Report.DataCommand
+	TerminalStatus     map[uint64]*TStatus
 
 	ticker *time.Ticker
 }
@@ -75,6 +81,7 @@ func (socket *RedisSocket) DoWork() {
 		case <-socket.ticker.C:
 			go socket.ProccessDataUploadMonitors()
 			go socket.ProccessDataUploadAlters()
+			go socket.ProccessTerminalStatus()
 		}
 	}
 }
@@ -101,4 +108,9 @@ func (socket *RedisSocket) RecvZmqDataUploadMonitors(monitors *Report.DataComman
 func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
 	log.Printf("<IN ZMQ>  alters %s %d \n", alters.Uuid, alters.Tid)
 	socket.DataUploadAlters = append(socket.DataUploadAlters, alters)
+}
+
+func (socket *RedisSocket) RecvZmqStatus(tid uint64, status *TStatus) {
+	socket.TerminalStatus[tid].Uuid = status.Uuid
+	socket.TerminalStatus[tid].Status = status.Status
 }

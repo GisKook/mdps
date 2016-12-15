@@ -13,10 +13,13 @@ const SEP_MONITORS string = "+"
 func (socket *RedisSocket) ProccessDataUploadMonitors() {
 	conn := socket.GetConn()
 	defer conn.Close()
+	conn.Do("SELECT", 14)
 
 	for _, data_command := range socket.DataUploadMonitors {
 		for _, monitor := range data_command.Monitors {
-			conn.Send("EXPIRE", monitor.Id, conf.GetConf().Redis.MonitorsKeyExpire)
+			conn.Send("EXPIRE", PREFIX_MONITORS+
+				strconv.FormatUint(data_command.Tid, 10),
+				conf.GetConf().Redis.MonitorsKeyExpire)
 			reader := bytes.NewReader(monitor.Data)
 			if monitor.DataType == 0 {
 				var byte_value byte

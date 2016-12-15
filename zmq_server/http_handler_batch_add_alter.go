@@ -95,7 +95,7 @@ func BatchAddAlterHandler(w http.ResponseWriter, r *http.Request) {
 		Uuid:         "das",
 		Tid:          batch_add_alter.Plc_id,
 		SerialNumber: batch_add_alter.Serial,
-		Type:         Report.ControlCommand_CMT_REQ_BATCH_ADD_MONITOR,
+		Type:         Report.ControlCommand_CMT_REQ_BATCH_ADD_ALTER,
 		Paras:        paras,
 	}
 

@@ -137,8 +137,10 @@ func (s *ZmqServer) Stop() {
 }
 
 func (s *ZmqServer) ProccessManageUp(p string) {
+	log.Println("proccess manage up")
 	command := &Report.ManageCommand{}
 	err := proto.Unmarshal([]byte(p), command)
+	log.Println(command)
 	if err != nil {
 		log.Println("unmarshal error")
 	} else {
@@ -147,6 +149,8 @@ func (s *ZmqServer) ProccessManageUp(p string) {
 			s.ProccessManageUpRegister(command)
 		case Report.ManageCommand_CMT_REQ_LOGIN:
 			s.ProccessManageUpLogin(command)
+		case Report.ManageCommand_CMT_REP_HEART:
+			s.ProccessManageUpHeart(command)
 		}
 	}
 }
