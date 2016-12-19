@@ -17,5 +17,13 @@
         "IdleTimeOut":240,
         "Passwd":"",
         "TranInterval":5
+    },
+
+    "DB":{ 
+        "Host":"123.150.98.35",
+        "Port":"3306",
+        "User":"dms",
+        "Passwd":"dms888",
+        "DbName":"dms",
     }
 }

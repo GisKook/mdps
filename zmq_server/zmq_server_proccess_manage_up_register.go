@@ -1,6 +1,7 @@
 package zmq_server
 
 import (
+	"github.com/giskook/mdps/db_socket"
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
 	zmq "github.com/pebbe/zmq3"
@@ -19,6 +20,9 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 	s_w_c_id := strconv.FormatUint(w_c_id, 10)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_w_c_id, zmq.SNDMORE)
 
+	log.Println(command.Cpuid)
+	plc_id := db_socket.GetDBSocket().GetPlcID(string(command.Cpuid))
+
 	para := []*Report.Param{
 		&Report.Param{
 			Type:  Report.Param_UINT8,
@@ -26,7 +30,7 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 		},
 		&Report.Param{
 			Type:  Report.Param_UINT64,
-			Npara: 1001,
+			Npara: plc_id,
 		},
 	}
 	command_rep := &Report.ManageCommand{

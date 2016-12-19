@@ -29,10 +29,19 @@ type RedisConf struct {
 	StatusExpire      uint32
 }
 
+type DBConf struct {
+	Host   string
+	Port   string
+	User   string
+	Passwd string
+	DbName string
+}
+
 type Configuration struct {
 	Http  *HttpConf
 	Zmq   *ZmqConf
 	Redis *RedisConf
+	DB    *DBConf
 }
 
 var G_conf *Configuration

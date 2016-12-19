@@ -63,6 +63,7 @@ func NewRedisSocket(config *conf.RedisConf) (*RedisSocket, error) {
 				DataUploadMonitors: make([]*Report.DataCommand, 0),
 				DataUploadAlters:   make([]*Report.DataCommand, 0),
 				ticker:             time.NewTicker(time.Duration(config.TranInterval) * time.Second),
+				TerminalStatus:     make(map[uint64]*TStatus),
 			}
 	}
 	return G_RedisSocket, nil
@@ -111,6 +112,9 @@ func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
 }
 
 func (socket *RedisSocket) RecvZmqStatus(tid uint64, status *TStatus) {
-	socket.TerminalStatus[tid].Uuid = status.Uuid
-	socket.TerminalStatus[tid].Status = status.Status
+	log.Println("redis recv zmq status")
+	_, ok := socket.TerminalStatus[tid]
+	if !ok {
+		socket.TerminalStatus[tid] = status
+	}
 }

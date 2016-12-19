@@ -1,7 +1,7 @@
 package redis_socket
 
 import (
-	"github.com/giskook/mdps/conf"
+	//"github.com/giskook/mdps/conf"
 	"strconv"
 )
 
@@ -16,13 +16,13 @@ const (
 func (socket *RedisSocket) ProccessTerminalStatus() {
 	conn := socket.GetConn()
 	defer conn.Close()
-	conn.Do("SELECT", 14)
+	//conn.Do("SELECT", 14)
 
 	for terminal_id := range socket.TerminalStatus {
-		conn.Send("EXPIRE",
-			PREFIX_STATUS+
-				strconv.FormatUint(terminal_id, 10),
-			conf.GetConf().Redis.StatusExpire)
+		//	conn.Send("EXPIRE",
+		//		PREFIX_STATUS+
+		//			strconv.FormatUint(terminal_id, 10),
+		//		conf.GetConf().Redis.StatusExpire)
 		conn.Send("HMSET",
 			PREFIX_STATUS+
 				strconv.FormatUint(terminal_id, 10),

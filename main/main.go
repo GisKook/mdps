@@ -4,6 +4,7 @@ import (
 	"fmt"
 	//zmq "github.com/pebbe/zmq3"
 	"github.com/giskook/mdps/conf"
+	"github.com/giskook/mdps/db_socket"
 	"github.com/giskook/mdps/redis_socket"
 	"github.com/giskook/mdps/zmq_server"
 	"log"
@@ -22,12 +23,16 @@ func main() {
 	zeromq_server.Init(config.Zmq)
 	go zeromq_server.Run()
 
+	redis_server, _ := redis_socket.NewRedisSocket(config.Redis)
+	go redis_server.DoWork()
+
+	db_socket.NewDbSocket(config.DB)
+
+	log.Println(db_socket.GetDBSocket().GetPlcID("2000"))
+
 	http_server := zmq_server.NewHttpServer(config.Http)
 	http_server.Init()
 	http_server.Start()
-
-	redis_server, _ := redis_socket.NewRedisSocket(config.Redis)
-	redis_server.DoWork()
 
 	// catchs system signal
 	chSig := make(chan os.Signal)

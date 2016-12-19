@@ -12,7 +12,7 @@
     },
 
     "Redis": {
-        "Addr": "192.168.2.119:6379",
+        "Addr": "123.150.98.35:6379",
         "MaxIdle":100,
         "IdleTimeOut":240,
         "Passwd":"",
@@ -20,5 +20,13 @@
         "MonitorsKeyExpire":20,
         "AltersKeyExpire":20,
         "StatusExpire":20
+    },
+
+    "DB":{ 
+        "Host":"123.150.98.35",
+        "Port":"3306",
+        "User":"dms",
+        "Passwd":"dms888",
+        "DbName":"dms"
     }
 }
