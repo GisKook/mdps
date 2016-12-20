@@ -28,8 +28,6 @@ func main() {
 
 	db_socket.NewDbSocket(config.DB)
 
-	log.Println(db_socket.GetDBSocket().GetPlcID("2000"))
-
 	http_server := zmq_server.NewHttpServer(config.Http)
 	http_server.Init()
 	http_server.Start()
