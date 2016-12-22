@@ -5,7 +5,7 @@ import (
 	"github.com/giskook/mdps/db_socket"
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
-	zmq "github.com/pebbe/zmq3"
+	zmq "github.com/pebbe/zmq4"
 	"log"
 	"strconv"
 )

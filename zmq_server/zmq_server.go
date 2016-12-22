@@ -4,7 +4,7 @@ import (
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
-	zmq "github.com/pebbe/zmq3"
+	zmq "github.com/pebbe/zmq4"
 	"log"
 	"strconv"
 	"sync"
@@ -120,6 +120,7 @@ func (s *ZmqServer) Run() {
 		case <-s.ExitChan:
 			return
 		case t_m_u := <-s.Socket_Terminal_Manage_Up_Chan:
+			log.Println("manage recv chan")
 			s.ProccessManageUp(t_m_u)
 		case t_c_u := <-s.Socket_Terminal_Control_Up_Chan:
 			log.Println("control recv chan")
