@@ -1,7 +1,7 @@
 {
     "Http":{
         "Addr":":8881",
-        "Timeout":5
+        "Timeout":10
     },
     "Zmq": {
         "TerminalManageUp":"tcp://*:1901",
@@ -16,10 +16,10 @@
         "MaxIdle":100,
         "IdleTimeOut":240,
         "Passwd":"",
-        "TranInterval":20,
+        "TranInterval":5,
         "MonitorsKeyExpire":20,
         "AltersKeyExpire":20,
-        "StatusExpire":20
+        "StatusExpire":150
     },
 
     "DB":{ 

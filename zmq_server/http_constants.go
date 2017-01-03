@@ -74,11 +74,13 @@ const (
 	HTTP_BATCH_ADD_ALTER_ALTERS_THRESHOLD      string = "threshold"
 
 	//////////////RESPONSE////////////////
-	HTTP_RESPONSE_RESULT               string = "result"
-	HTTP_RESPONSE_RESULT_SUCCESS       string = "0"
-	HTTP_RESPONSE_RESULT_SERVER_FAILED string = "1"
-	HTTP_RESPONSE_RESULT_PARAMTER_ERR  string = "2"
-	HTTP_RESPONSE_RESULT_TIMEOUT       string = "3"
+	//HTTP_RESPONSE_RESULT               string = "result"
+	HTTP_RESPONSE_RESULT_SUCCESS       uint8 = 0
+	HTTP_RESPONSE_RESULT_SERVER_FAILED uint8 = 1
+	HTTP_RESPONSE_RESULT_PARAMTER_ERR  uint8 = 2
+	HTTP_RESPONSE_RESULT_TIMEOUT       uint8 = 3
 
-	HTTP_RESPONSE_SERIAL_PORT string = "serial_port"
+	//HTTP_RESPONSE_SERIAL_PORT string = "serial_port"
 )
+
+var HTTP_RESULT []string = []string{"成功", "失败,路由器反馈失败 或 dps服务器内部错误", "参数错误", "超时,路由器掉线 或 路由器反馈慢"}

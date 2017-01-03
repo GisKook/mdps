@@ -27,9 +27,10 @@ message DataCommand {
 		CMT_REP_DATA_UPLOAD_ALTERS   = 0x800c;
 		
 	}
-	string  uuid = 1;
-	uint64  tid = 2;
-	uint32  serial_number = 3; 
+	string uuid = 1;
+	uint64 tid = 2;
+	uint32 serial_number = 3; 
+	uint32 serial_port = 4;
 	CommandType type = 5;
 	repeated Monitor monitors= 6;
 	repeated Alter alters = 7;

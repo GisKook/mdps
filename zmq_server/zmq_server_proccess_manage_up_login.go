@@ -14,11 +14,11 @@ func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {
 	uuid := command.Uuid
 	s.Socket_Terminal_Manage_Down_Socket.Send(uuid, zmq.SNDMORE)
 
+	log.Println("proccess login")
 	tid := command.Tid
 	s_tid := strconv.FormatUint(tid, 10)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_tid, zmq.SNDMORE)
-	log.Println("proccess login")
-	check := db_socket.GetDBSocket().CheckPlcID(122)
+	check := db_socket.GetDBSocket().CheckPlcID(tid)
 	log.Println(check)
 	if check == 1 {
 		check = 0
@@ -33,6 +33,7 @@ func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {
 		},
 	}
 	command_rep := &Report.ManageCommand{
+		Tid:   tid,
 		Type:  Report.ManageCommand_CMT_REP_LOGIN,
 		Paras: para,
 	}

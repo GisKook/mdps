@@ -13,17 +13,19 @@ import (
 )
 
 type DataDownload struct {
-	Plc_id      uint64
-	Serial      uint32
-	Serial_Port uint8
-	Modbus_Addr uint16
-	Data_type   uint8
-	Data_len    uint8
-	Data        string
+	Plc_id      *uint64
+	Serial      *uint32
+	Serial_Port *uint8
+	Modbus_Addr *uint16
+	Data_type   *uint8
+	Data_len    *uint8
+	Data        *string
 }
 
 func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	log.Println(r.Form)
+	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var data_download DataDownload
 	err := decoder.Decode(&data_download)
@@ -33,38 +35,48 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	log.Println(data_download)
 
-	var jsonResult []byte
+	if data_download.Plc_id == nil ||
+		data_download.Serial == nil ||
+		data_download.Serial_Port == nil ||
+		data_download.Modbus_Addr == nil ||
+		data_download.Data_type == nil ||
+		data_download.Data_len == nil ||
+		data_download.Data == nil {
+		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
+
+		return
+	}
+	log.Println(data_download)
+
 	defer func() {
 		if x := recover(); x != nil {
-			jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_SERVER_FAILED})
-			fmt.Fprint(w, string(jsonResult))
-			log.Println("3")
+			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
 
-	data, _ := base64.StdEncoding.DecodeString(data_download.Data)
+	data, _ := base64.StdEncoding.DecodeString(*data_download.Data)
 	log.Println(data)
 	req := &Report.ControlCommand{
 		Uuid:         "das",
-		Tid:          data_download.Plc_id,
-		SerialNumber: data_download.Serial,
+		Tid:          *data_download.Plc_id,
+		SerialNumber: *data_download.Serial,
 		Type:         Report.ControlCommand_CMT_REQ_DATA_DOWNLOAD,
 		Paras: []*Report.Param{
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_download.Serial_Port),
+				Npara: uint64(*data_download.Serial_Port),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT16,
-				Npara: uint64(data_download.Modbus_Addr),
+				Npara: uint64(*data_download.Modbus_Addr),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_download.Data_type),
+				Npara: uint64(*data_download.Data_type),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_download.Data_len),
+				Npara: uint64(*data_download.Data_len),
 			},
 			&Report.Param{
 				Type:  Report.Param_BYTES,
@@ -73,7 +85,7 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	chan_key := GenerateKey(data_download.Plc_id, data_download.Serial)
+	chan_key := GenerateKey(*data_download.Plc_id, *data_download.Serial)
 
 	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
 
@@ -87,16 +99,14 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case res := <-chan_response:
-		serial_port := (*Report.ControlCommand)(res).Paras[0].Npara
 		result := (*Report.ControlCommand)(res).Paras[1].Npara
-		jsonResult, _ = json.Marshal(map[string]uint64{HTTP_RESPONSE_SERIAL_PORT: serial_port, HTTP_RESPONSE_RESULT: result})
-		fmt.Fprint(w, string(jsonResult))
+		fmt.Fprint(w, EncodingGeneralResponse(uint8(result)))
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
 		close(chan_response)
 		delete(GetHttpServer().HttpRespones, chan_key)
-		jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_TIMEOUT})
-		fmt.Fprint(w, string(jsonResult))
+
+		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
 	}
 }

@@ -1,6 +1,7 @@
 package zmq_server
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 )
@@ -38,4 +39,20 @@ func GenerateKey(id uint64, serial uint32) uint64 {
 	d_serial = uint64(serial)<<32 + uint64(serial)
 
 	return id ^ d_serial
+}
+
+type GeneralResponse struct {
+	Result uint8  `json:"result"`
+	Desc   string `json:"desc"`
+}
+
+func EncodingGeneralResponse(result uint8) string {
+	general_response := &GeneralResponse{
+		Result: result,
+		Desc:   HTTP_RESULT[result],
+	}
+
+	response, _ := json.Marshal(general_response)
+
+	return string(response)
 }

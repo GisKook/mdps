@@ -1,7 +1,6 @@
 package zmq_server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
@@ -14,20 +13,15 @@ import (
 func RestartHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(r)
 
-	var jsonResult []byte
 	defer func() {
 		if x := recover(); x != nil {
-			jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_SERVER_FAILED})
-			fmt.Fprint(w, string(jsonResult))
-			log.Println("3")
+			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
 
 	r.ParseForm()
 	if !CheckParamters(r, HTTP_PLC_ID, HTTP_PLC_SERIAL, HTTP_RESTART_DELAY) {
-		jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_PARAMTER_ERR})
-		log.Println("1")
-		fmt.Fprint(w, string(jsonResult))
+		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 
 		return
 	}
@@ -64,15 +58,13 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case res := <-chan_response:
-		value := (*Report.ControlCommand)(res).Paras[0].Npara
-		jsonResult, _ = json.Marshal(map[string]uint64{HTTP_RESPONSE_RESULT: value})
-		fmt.Fprint(w, string(jsonResult))
+		value := uint8((*Report.ControlCommand)(res).Paras[0].Npara)
+		fmt.Fprint(w, EncodingGeneralResponse(value))
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
 		close(chan_response)
 		delete(GetHttpServer().HttpRespones, chan_key)
-		jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_TIMEOUT})
-		fmt.Fprint(w, string(jsonResult))
+		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
 	}
 }

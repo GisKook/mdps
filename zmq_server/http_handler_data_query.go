@@ -13,19 +13,40 @@ import (
 )
 
 type DataQuery struct {
-	Plc_id      uint64
-	Serial      uint32
-	Serial_Port uint8
-	Modbus_Addr uint16
-	Data_type   uint8
-	Data_len    uint8
+	Plc_id      *uint64
+	Serial      *uint32
+	Serial_Port *uint8
+	Modbus_Addr *uint16
+	Data_type   *uint8
+	Data_len    *uint8
 }
 
 type DataQueryResponse struct {
-	SerialPort uint8
-	Datatype   uint8
-	DataLen    uint8
-	Data       string
+	Result     uint8  `json:"result"`
+	Desc       string `json:"desc"`
+	SerialPort uint8  `json:"serial_port"`
+	Datatype   uint8  `json:"data_type"`
+	DataLen    uint8  `json:"data_len"`
+	Data       string `json:"data"`
+}
+
+func CheckParamtersDataQueryErr(data_query *DataQuery) bool {
+	if data_query.Plc_id == nil ||
+		data_query.Serial == nil ||
+		data_query.Serial_Port == nil ||
+		data_query.Modbus_Addr == nil ||
+		data_query.Data_type == nil ||
+		data_query.Data_len == nil {
+		return true
+	}
+
+	return false
+}
+
+func EncodingDataQueryResponse(data_query_response *DataQueryResponse) string {
+	response, _ := json.Marshal(data_query_response)
+
+	return string(response)
 }
 
 func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,42 +59,47 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	log.Println(data_query)
+	if CheckParamtersDataQueryErr(&data_query) {
+		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
+		return
+	}
 
-	var jsonResult []byte
 	defer func() {
 		if x := recover(); x != nil {
-			jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_SERVER_FAILED})
-			fmt.Fprint(w, string(jsonResult))
-			log.Println("3")
+			fmt.Fprint(w, EncodingDataQueryResponse(
+				&DataQueryResponse{
+					Result: HTTP_RESPONSE_RESULT_SERVER_FAILED,
+					Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_SERVER_FAILED],
+				}))
 		}
 	}()
 
 	req := &Report.ControlCommand{
 		Uuid:         "das",
-		Tid:          data_query.Plc_id,
-		SerialNumber: data_query.Serial,
+		Tid:          *data_query.Plc_id,
+		SerialNumber: *data_query.Serial,
 		Type:         Report.ControlCommand_CMT_REQ_DATA_QUERY,
 		Paras: []*Report.Param{
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_query.Serial_Port),
+				Npara: uint64(*data_query.Serial_Port),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT16,
-				Npara: uint64(data_query.Modbus_Addr),
+				Npara: uint64(*data_query.Modbus_Addr),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_query.Data_type),
+				Npara: uint64(*data_query.Data_type),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(data_query.Data_len),
+				Npara: uint64(*data_query.Data_len),
 			},
 		},
 	}
 
-	chan_key := GenerateKey(data_query.Plc_id, data_query.Serial)
+	chan_key := GenerateKey(*data_query.Plc_id, *data_query.Serial)
 
 	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
 
@@ -94,19 +120,22 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 		data_base64 := base64.StdEncoding.EncodeToString(data)
 
 		data_query_response := &DataQueryResponse{
+			Result:     HTTP_RESPONSE_RESULT_SUCCESS,
+			Desc:       HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS],
 			SerialPort: serial_port,
 			Datatype:   data_type,
 			DataLen:    data_len,
 			Data:       data_base64,
 		}
-		jsonResult, _ = json.Marshal(data_query_response)
-		fmt.Fprint(w, string(jsonResult))
+		fmt.Fprint(w, EncodingDataQueryResponse(data_query_response))
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
 		close(chan_response)
 		delete(GetHttpServer().HttpRespones, chan_key)
-		jsonResult, _ = json.Marshal(map[string]string{HTTP_RESPONSE_RESULT: HTTP_RESPONSE_RESULT_TIMEOUT})
-		fmt.Fprint(w, string(jsonResult))
+		fmt.Fprint(w, EncodingDataQueryResponse(&DataQueryResponse{
+			Result: HTTP_RESPONSE_RESULT_TIMEOUT,
+			Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_TIMEOUT],
+		}))
 	}
 }
