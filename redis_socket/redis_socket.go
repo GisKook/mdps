@@ -5,12 +5,15 @@ import (
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
 	"log"
+	"sync"
 	"time"
 )
 
 type TStatus struct {
-	Uuid   string
-	Status uint8
+	Uuid      string
+	Tid       uint64
+	Status    uint8
+	Timestamp int64
 }
 
 type RedisSocket struct {
@@ -18,7 +21,10 @@ type RedisSocket struct {
 	Pool               *redis.Pool
 	DataUploadMonitors []*Report.DataCommand
 	DataUploadAlters   []*Report.DataCommand
-	TerminalStatus     map[uint64]*TStatus
+
+	Mutex_Terminal_Status sync.Mutex
+	Terminal_Status       []*TStatus
+	Terminal_Status_Chan  chan *TStatus
 
 	ticker *time.Ticker
 }
@@ -60,10 +66,11 @@ func NewRedisSocket(config *conf.RedisConf) (*RedisSocket, error) {
 						return err
 					},
 				},
-				DataUploadMonitors: make([]*Report.DataCommand, 0),
-				DataUploadAlters:   make([]*Report.DataCommand, 0),
-				ticker:             time.NewTicker(time.Duration(config.TranInterval) * time.Second),
-				TerminalStatus:     make(map[uint64]*TStatus),
+				DataUploadMonitors:   make([]*Report.DataCommand, 0),
+				DataUploadAlters:     make([]*Report.DataCommand, 0),
+				ticker:               time.NewTicker(time.Duration(config.TranInterval) * time.Second),
+				Terminal_Status:      make([]*TStatus, 0),
+				Terminal_Status_Chan: make(chan *TStatus),
 			}
 	}
 	return G_RedisSocket, nil
@@ -83,6 +90,10 @@ func (socket *RedisSocket) DoWork() {
 			go socket.ProccessDataUploadMonitors()
 			go socket.ProccessDataUploadAlters()
 			go socket.ProccessTerminalStatus()
+		case p := <-socket.Terminal_Status_Chan:
+			socket.Mutex_Terminal_Status.Lock()
+			socket.Terminal_Status = append(socket.Terminal_Status, p)
+			socket.Mutex_Terminal_Status.Unlock()
 		}
 	}
 }
@@ -92,18 +103,13 @@ func (socket *RedisSocket) GetConn() redis.Conn {
 }
 
 func (socket *RedisSocket) Close() {
+	close(socket.Terminal_Status_Chan)
 	socket.ticker.Stop()
 }
 
 func (socket *RedisSocket) RecvZmqDataUploadMonitors(monitors *Report.DataCommand) {
-	//	monitors := &Report.DataCommand{}
-	//	err := proto.Unmarshal(message, monitors)
-	//	if err != nil {
-	//		log.Println("unmarshal error")
-	//	} else {
 	log.Printf("<IN ZMQ>  monitors %s %d \n", monitors.Uuid, monitors.Tid)
 	socket.DataUploadMonitors = append(socket.DataUploadMonitors, monitors)
-	//	}
 }
 
 func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
@@ -111,10 +117,7 @@ func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
 	socket.DataUploadAlters = append(socket.DataUploadAlters, alters)
 }
 
-func (socket *RedisSocket) RecvZmqStatus(tid uint64, status *TStatus) {
+func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {
 	log.Println("redis recv zmq status")
-	_, ok := socket.TerminalStatus[tid]
-	if !ok {
-		socket.TerminalStatus[tid] = status
-	}
+	socket.Terminal_Status_Chan <- status
 }

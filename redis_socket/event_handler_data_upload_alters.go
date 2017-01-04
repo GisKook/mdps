@@ -54,8 +54,8 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 							strconv.Itoa(int(alter.DataType))+
 							SEP_ALTERS+
 							strconv.Itoa(int(alter.DataLen)),
-						//append([]byte{byte(alter.Status)}, alter.Data...))
-						base.GetString(append([]byte{byte(alter.Status)}, alter.Data...)))
+						append([]byte{byte(alter.Status)}, alter.Data...))
+					//base.GetString(append([]byte{byte(alter.Status)}, alter.Data...)))
 					//	}
 				}
 			}

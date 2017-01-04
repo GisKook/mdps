@@ -58,8 +58,8 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 							strconv.Itoa(int(monitor.DataType))+
 							SEP_MONITORS+
 							strconv.Itoa(int(monitor.DataLen)),
-						//monitor.Data)
-						base.GetString(monitor.Data))
+						monitor.Data)
+					//base.GetString(monitor.Data))
 					//}
 				}
 			}
