@@ -29,6 +29,13 @@ func (server *Http_server) Init() {
 	http.HandleFunc(HTTP_DATA_QUERY, DataQueryHandler)
 	http.HandleFunc(HTTP_BATCH_ADD_MONITOR, BatchAddMonitorHandler)
 	http.HandleFunc(HTTP_BATCH_ADD_ALTER, BatchAddAlterHandler)
+
+	http.HandleFunc(HTTP_SET_SERVER_ADDR, SetServerAddrHandler)
+	http.HandleFunc(HTTP_GET_SERVER_ADDR, GetServerAddrHandler)
+	http.HandleFunc(HTTP_RS232_GET_CONFIG, Rs232GetConfigHandler)
+	http.HandleFunc(HTTP_RS232_SET_CONFIG, Rs232SetConfigHandler)
+	http.HandleFunc(HTTP_RS485_GET_CONFIG, Rs485GetConfigHandler)
+	http.HandleFunc(HTTP_RS485_SET_CONFIG, Rs485SetConfigHandler)
 }
 
 func (server *Http_server) Start() {

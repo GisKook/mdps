@@ -10,6 +10,7 @@ const (
 
 	STATUS_KEY_UUID   string = "uuid"
 	STATUS_KEY_STATUS string = "status"
+	STATUS_KEY_ID     string = "id"
 	//STATUS_KEY_TIME   string = "time"
 )
 
@@ -30,6 +31,8 @@ func (socket *RedisSocket) ProccessTerminalStatus() {
 				terminal_status.Uuid,
 				STATUS_KEY_STATUS,
 				terminal_status.Status,
+				STATUS_KEY_ID,
+				terminal_status.Tid,
 				//			STATUS_KEY_TIME,
 				//			strconv.FormatInt(time.Now().Unix(), 10),
 			)

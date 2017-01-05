@@ -73,6 +73,24 @@ const (
 	HTTP_BATCH_ADD_ALTER_ALTERS_COND           string = "cond"
 	HTTP_BATCH_ADD_ALTER_ALTERS_THRESHOLD      string = "threshold"
 
+	// set server addr
+	HTTP_SET_SERVER_ADDR string = "/plc/set_server_addr"
+
+	// get server addr
+	HTTP_GET_SERVER_ADDR string = "/plc/get_server_addr"
+
+	// rs232 get config
+	HTTP_RS232_GET_CONFIG string = "/plc/rs232_get_config"
+
+	// rs232 set config
+	HTTP_RS232_SET_CONFIG string = "/plc/rs232_set_config"
+
+	// rs485 get config
+	HTTP_RS485_GET_CONFIG string = "/plc/rs485_get_config"
+
+	// rs485 set config
+	HTTP_RS485_SET_CONFIG string = "/plc/rs485_set_config"
+
 	//////////////RESPONSE////////////////
 	//HTTP_RESPONSE_RESULT               string = "result"
 	HTTP_RESPONSE_RESULT_SUCCESS       uint8 = 0

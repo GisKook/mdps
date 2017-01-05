@@ -90,6 +90,7 @@ func (socket *RedisSocket) DoWork() {
 			go socket.ProccessDataUploadMonitors()
 			go socket.ProccessDataUploadAlters()
 			go socket.ProccessTerminalStatus()
+			go GetStatusChecker().Check()
 		case p := <-socket.Terminal_Status_Chan:
 			socket.Mutex_Terminal_Status.Lock()
 			socket.Terminal_Status = append(socket.Terminal_Status, p)
