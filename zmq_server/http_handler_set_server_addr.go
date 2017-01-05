@@ -11,12 +11,12 @@ import (
 	"time"
 )
 
-type SetServerAddr struct {
+type SetServer_Addr struct {
 	Plc_id          *uint64
 	Serial          *uint32
 	Connection_Type *uint8
 	Server_Class    *uint8
-	ServerAddr      *string
+	Server_Addr     *string
 	Port            *uint16
 }
 
@@ -25,7 +25,7 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Form)
 	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
-	var set_server_addr SetServerAddr
+	var set_server_addr SetServer_Addr
 	err := decoder.Decode(&set_server_addr)
 	if err != nil {
 		panic(err)
@@ -36,7 +36,7 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 		set_server_addr.Serial == nil ||
 		set_server_addr.Connection_Type == nil ||
 		set_server_addr.Server_Class == nil ||
-		set_server_addr.ServerAddr == nil ||
+		set_server_addr.Server_Addr == nil ||
 		set_server_addr.Port == nil {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 
@@ -66,7 +66,7 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 			},
 			&Report.Param{
 				Type:    Report.Param_STRING,
-				Strpara: *set_server_addr.ServerAddr,
+				Strpara: *set_server_addr.Server_Addr,
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,

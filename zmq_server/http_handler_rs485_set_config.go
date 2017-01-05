@@ -12,14 +12,14 @@ import (
 )
 
 type Rs485SetConfig struct {
-	Plc_id     *uint64
-	Serial     *uint32
-	SerialPort *uint8
-	StartBit   *uint8
-	EndBit     *uint8
-	DataBit    *uint8
-	Check      *uint8
-	BaudRate   *uint32
+	Plc_id      *uint64
+	Serial      *uint32
+	Serial_Port *uint8
+	Start_Bit   *uint8
+	End_Bit     *uint8
+	Data_Bit    *uint8
+	Check_Bit   *uint8
+	Baud_Rate   *uint32
 }
 
 func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,12 +36,12 @@ func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	if rs485_set_cnfig.Plc_id == nil ||
 		rs485_set_cnfig.Serial == nil ||
-		rs485_set_cnfig.SerialPort == nil ||
-		rs485_set_cnfig.StartBit == nil ||
-		rs485_set_cnfig.EndBit == nil ||
-		rs485_set_cnfig.DataBit == nil ||
-		rs485_set_cnfig.Check == nil ||
-		rs485_set_cnfig.BaudRate == nil {
+		rs485_set_cnfig.Serial_Port == nil ||
+		rs485_set_cnfig.Start_Bit == nil ||
+		rs485_set_cnfig.End_Bit == nil ||
+		rs485_set_cnfig.Data_Bit == nil ||
+		rs485_set_cnfig.Check_Bit == nil ||
+		rs485_set_cnfig.Baud_Rate == nil {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 
 		return
@@ -62,27 +62,27 @@ func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		Paras: []*Report.Param{
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_set_cnfig.SerialPort),
+				Npara: uint64(*rs485_set_cnfig.Serial_Port),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_set_cnfig.StartBit),
+				Npara: uint64(*rs485_set_cnfig.Start_Bit),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_set_cnfig.EndBit),
+				Npara: uint64(*rs485_set_cnfig.End_Bit),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_set_cnfig.DataBit),
+				Npara: uint64(*rs485_set_cnfig.Data_Bit),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_set_cnfig.Check),
+				Npara: uint64(*rs485_set_cnfig.Check_Bit),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT32,
-				Npara: uint64(*rs485_set_cnfig.BaudRate),
+				Npara: uint64(*rs485_set_cnfig.Baud_Rate),
 			},
 		},
 	}

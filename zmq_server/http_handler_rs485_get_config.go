@@ -12,18 +12,18 @@ import (
 )
 
 type Rs485GetConfig struct {
-	Plc_id     *uint64
-	Serial     *uint32
-	SerialPort *uint8
+	Plc_id      *uint64
+	Serial      *uint32
+	Serial_Port *uint8
 }
 
 type Rs485GetConfigResponse struct {
-	SerialPort uint8  `json:"serial_port"`
-	StartBit   uint8  `json:"start_bit"`
-	EndBit     uint8  `json:"end_bit"`
-	DataBit    uint8  `json:"data_bit"`
-	CheckBit   uint8  `json:"check_bit"`
-	BaudRate   uint32 `json:"baud_rate"`
+	Serial_Port uint8  `json:"serial_port"`
+	StartBit    uint8  `json:"start_bit"`
+	EndBit      uint8  `json:"end_bit"`
+	DataBit     uint8  `json:"data_bit"`
+	CheckBit    uint8  `json:"check_bit"`
+	BaudRate    uint32 `json:"baud_rate"`
 }
 
 func EncodeRs485GetConfigResponse(response *Report.ControlCommand) string {
@@ -35,12 +35,12 @@ func EncodeRs485GetConfigResponse(response *Report.ControlCommand) string {
 	baud_rate := uint32(response.Paras[5].Npara)
 
 	response_json, _ := json.Marshal(Rs485GetConfigResponse{
-		SerialPort: serial_port,
-		StartBit:   start_bit,
-		EndBit:     end_bit,
-		DataBit:    data_bit,
-		CheckBit:   check_bit,
-		BaudRate:   baud_rate,
+		Serial_Port: serial_port,
+		StartBit:    start_bit,
+		EndBit:      end_bit,
+		DataBit:     data_bit,
+		CheckBit:    check_bit,
+		BaudRate:    baud_rate,
 	})
 
 	return string(response_json)
@@ -60,7 +60,7 @@ func Rs485GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	if rs485_get_config.Plc_id == nil ||
 		rs485_get_config.Serial == nil ||
-		rs485_get_config.SerialPort == nil {
+		rs485_get_config.Serial_Port == nil {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 
 		return
@@ -81,7 +81,7 @@ func Rs485GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		Paras: []*Report.Param{
 			&Report.Param{
 				Type:  Report.Param_UINT8,
-				Npara: uint64(*rs485_get_config.SerialPort),
+				Npara: uint64(*rs485_get_config.Serial_Port),
 			},
 		},
 	}

@@ -24,6 +24,7 @@ func main() {
 	go zeromq_server.Run()
 
 	redis_server, _ := redis_socket.NewRedisSocket(config.Redis)
+	redis_server.LoadAll()
 	go redis_server.DoWork()
 
 	db_socket.NewDbSocket(config.DB)
