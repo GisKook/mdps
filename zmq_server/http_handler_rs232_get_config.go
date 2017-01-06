@@ -18,6 +18,8 @@ type Rs232GetConfig struct {
 }
 
 type Rs232GetConfigResponse struct {
+	Result      uint8  `json:"result"`
+	Desc        string `json:"desc"`
 	Serial_Port uint8  `json:"serial_port"`
 	StartBit    uint8  `json:"start_bit"`
 	EndBit      uint8  `json:"end_bit"`
@@ -35,6 +37,8 @@ func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 	baud_rate := uint32(response.Paras[5].Npara)
 
 	response_json, _ := json.Marshal(Rs232GetConfigResponse{
+		Result:      HTTP_RESPONSE_RESULT_SUCCESS,
+		Desc:        HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS],
 		Serial_Port: serial_port,
 		StartBit:    start_bit,
 		EndBit:      end_bit,

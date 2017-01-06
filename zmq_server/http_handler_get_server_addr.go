@@ -25,12 +25,16 @@ type ServerAddr struct {
 }
 
 type GetServerAddrResponse struct {
-	Addrs []*ServerAddr `json:"servers"`
+	Result uint8         `json:"result"`
+	Desc   string        `json:"desc"`
+	Addrs  []*ServerAddr `json:"servers"`
 }
 
 func EncodeGetServerAddrResponse(response *Report.ControlCommand) string {
 	server_count := response.Paras[0].Npara
 	var get_server_addr_reponse GetServerAddrResponse
+	get_server_addr_reponse.Result = HTTP_RESPONSE_RESULT_SUCCESS
+	get_server_addr_reponse.Desc = HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS]
 	for i := 0; i < int(server_count); i++ {
 		get_server_addr_reponse.Addrs = append(get_server_addr_reponse.Addrs, &ServerAddr{
 			ConnectionType: uint8(response.Paras[i+1].Npara),
