@@ -15,9 +15,10 @@ func CheckError(err error) {
 }
 
 func PreTreatmentKeys(keys []string) []string {
-	for i, key := range keys {
+	var result []string
+	for _, key := range keys {
 		if !strings.Contains(key, PREFIX_STATUS) {
-			keys = append(keys[0:i], keys[i+1:]...)
+			result = append(result, key)
 		}
 	}
 
@@ -40,6 +41,7 @@ func (socket *RedisSocket) LoadAll() {
 		CheckError(e)
 		cursor_keys, e = redis.Values(value, e)
 		CheckError(e)
+		log.Println(cursor_keys)
 		cursor, e = redis.String(cursor_keys[0], nil)
 		CheckError(e)
 		keys, e = redis.Strings(cursor_keys[1], nil)

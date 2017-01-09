@@ -10,6 +10,7 @@ import (
 type Http_server struct {
 	Addr         string
 	HttpRespones map[uint64]chan *Report.ControlCommand
+	SerialID     uint32
 }
 
 var G_HttpServer *Http_server
@@ -18,6 +19,7 @@ func NewHttpServer(config *conf.HttpConf) *Http_server {
 	G_HttpServer = &Http_server{
 		Addr:         config.Addr,
 		HttpRespones: make(map[uint64]chan *Report.ControlCommand),
+		SerialID:     0,
 	}
 
 	return G_HttpServer

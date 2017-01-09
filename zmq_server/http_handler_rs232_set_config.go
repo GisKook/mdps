@@ -15,6 +15,8 @@ type Rs232SetConfig struct {
 	Plc_id      *uint64
 	Serial      *uint32
 	Serial_Port *uint8
+	Node_Type   *uint8
+	Station_id  *uint8
 	Start_Bit   *uint8
 	End_Bit     *uint8
 	Data_Bit    *uint8
@@ -37,6 +39,8 @@ func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 	if rs232_set_cnfig.Plc_id == nil ||
 		rs232_set_cnfig.Serial == nil ||
 		rs232_set_cnfig.Serial_Port == nil ||
+		rs232_set_cnfig.Node_Type == nil ||
+		rs232_set_cnfig.Station_id == nil ||
 		rs232_set_cnfig.Start_Bit == nil ||
 		rs232_set_cnfig.End_Bit == nil ||
 		rs232_set_cnfig.Data_Bit == nil ||
@@ -63,6 +67,14 @@ func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 			&Report.Param{
 				Type:  Report.Param_UINT8,
 				Npara: uint64(*rs232_set_cnfig.Serial_Port),
+			},
+			&Report.Param{
+				Type:  Report.Param_UINT8,
+				Npara: uint64(*rs232_set_cnfig.Node_Type),
+			},
+			&Report.Param{
+				Type:  Report.Param_UINT8,
+				Npara: uint64(*rs232_set_cnfig.Station_id),
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT8,

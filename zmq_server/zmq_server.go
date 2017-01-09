@@ -174,6 +174,14 @@ func (s *ZmqServer) ProccessControlUp(p string) {
 			s.ProccessControlRepBatchAddMonitor(command)
 		case Report.ControlCommand_CMT_REP_BATCH_ADD_ALTER:
 			s.ProccessControlRepBatchAddAlter(command)
+		case Report.ControlCommand_CMT_REP_RS232_GET_CONFIG:
+			s.ProccessControlRepRs232GetConfig(command)
+		case Report.ControlCommand_CMT_REP_RS232_SET_CONFIG:
+			s.ProccessControlRepRs232SetConfig(command)
+		case Report.ControlCommand_CMT_REP_GET_SERVER_ADDR:
+			s.ProccessControlRepGetServerAddr(command)
+		case Report.ControlCommand_CMT_REP_SET_SERVER_ADDR:
+			s.ProccessControlRepSetServerAddr(command)
 		}
 	}
 }

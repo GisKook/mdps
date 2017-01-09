@@ -21,6 +21,8 @@ type Rs232GetConfigResponse struct {
 	Result      uint8  `json:"result"`
 	Desc        string `json:"desc"`
 	Serial_Port uint8  `json:"serial_port"`
+	NodeType    uint8  `json:"node_type"`
+	StationID   uint8  `json:"station_id"`
 	StartBit    uint8  `json:"start_bit"`
 	EndBit      uint8  `json:"end_bit"`
 	DataBit     uint8  `json:"data_bit"`
@@ -30,16 +32,20 @@ type Rs232GetConfigResponse struct {
 
 func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 	serial_port := uint8(response.Paras[0].Npara)
-	start_bit := uint8(response.Paras[1].Npara)
-	end_bit := uint8(response.Paras[2].Npara)
-	data_bit := uint8(response.Paras[3].Npara)
-	check_bit := uint8(response.Paras[4].Npara)
-	baud_rate := uint32(response.Paras[5].Npara)
+	node_type := uint8(response.Paras[1].Npara)
+	station_id := uint8(response.Paras[2].Npara)
+	start_bit := uint8(response.Paras[3].Npara)
+	end_bit := uint8(response.Paras[4].Npara)
+	data_bit := uint8(response.Paras[5].Npara)
+	check_bit := uint8(response.Paras[6].Npara)
+	baud_rate := uint32(response.Paras[7].Npara)
 
 	response_json, _ := json.Marshal(Rs232GetConfigResponse{
 		Result:      HTTP_RESPONSE_RESULT_SUCCESS,
 		Desc:        HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS],
 		Serial_Port: serial_port,
+		NodeType:    node_type,
+		StationID:   station_id,
 		StartBit:    start_bit,
 		EndBit:      end_bit,
 		DataBit:     data_bit,
