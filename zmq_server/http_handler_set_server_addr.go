@@ -11,13 +11,40 @@ import (
 	"time"
 )
 
-type SetServer_Addr struct {
-	Plc_id          *uint64
-	Serial          *uint32
+type Server_Addr struct {
 	Connection_Type *uint8
 	Server_Class    *uint8
 	Server_Addr     *string
 	Port            *uint16
+}
+
+type SetServer_Addr struct {
+	Plc_id  *uint64
+	Serial  *uint32
+	Servers *[]*Server_Addr
+}
+
+func CheckParamtersSetServerAddrErr(server_addrs *SetServer_Addr) bool {
+	if server_addrs.Plc_id == nil ||
+		server_addrs.Serial == nil ||
+		server_addrs.Servers == nil {
+		return true
+	}
+
+	for _, server_addr := range *server_addrs.Servers {
+		if server_addr == nil {
+			return true
+		}
+		if server_addr.Connection_Type == nil ||
+			server_addr.Server_Class == nil ||
+			server_addr.Server_Addr == nil ||
+			server_addr.Port == nil {
+			return true
+		}
+	}
+
+	return false
+
 }
 
 func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,12 +59,7 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if set_server_addr.Plc_id == nil ||
-		set_server_addr.Serial == nil ||
-		set_server_addr.Connection_Type == nil ||
-		set_server_addr.Server_Class == nil ||
-		set_server_addr.Server_Addr == nil ||
-		set_server_addr.Port == nil {
+	if CheckParamtersSetServerAddrErr(&set_server_addr) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 
 		return
@@ -50,29 +72,38 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	paras := []*Report.Param{
+		&Report.Param{
+			Type:  Report.Param_UINT8,
+			Npara: uint64(len(*set_server_addr.Servers)),
+		},
+	}
+
+	for _, server := range *set_server_addr.Servers {
+		paras = append(paras, &Report.Param{
+			Type:  Report.Param_UINT8,
+			Npara: uint64(*server.Connection_Type),
+		})
+		paras = append(paras, &Report.Param{
+			Type:  Report.Param_UINT8,
+			Npara: uint64(*server.Server_Class),
+		})
+		paras = append(paras, &Report.Param{
+			Type:    Report.Param_STRING,
+			Strpara: *server.Server_Addr,
+		})
+		paras = append(paras, &Report.Param{
+			Type:  Report.Param_UINT8,
+			Npara: uint64(*server.Port),
+		})
+	}
+	log.Println(paras)
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *set_server_addr.Plc_id,
 		SerialNumber: *set_server_addr.Serial,
 		Type:         Report.ControlCommand_CMT_REQ_SET_SERVER_ADDR,
-		Paras: []*Report.Param{
-			&Report.Param{
-				Type:  Report.Param_UINT8,
-				Npara: uint64(*set_server_addr.Connection_Type),
-			},
-			&Report.Param{
-				Type:  Report.Param_UINT8,
-				Npara: uint64(*set_server_addr.Server_Class),
-			},
-			&Report.Param{
-				Type:    Report.Param_STRING,
-				Strpara: *set_server_addr.Server_Addr,
-			},
-			&Report.Param{
-				Type:  Report.Param_UINT8,
-				Npara: uint64(*set_server_addr.Port),
-			},
-		},
+		Paras:        paras,
 	}
 
 	chan_key := GenerateKey(*set_server_addr.Plc_id, *set_server_addr.Serial)

@@ -37,10 +37,10 @@ func EncodeGetServerAddrResponse(response *Report.ControlCommand) string {
 	get_server_addr_reponse.Desc = HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS]
 	for i := 0; i < int(server_count); i++ {
 		get_server_addr_reponse.Addrs = append(get_server_addr_reponse.Addrs, &ServerAddr{
-			ConnectionType: uint8(response.Paras[i+1].Npara),
-			ServerClass:    uint8(response.Paras[i+2].Npara),
-			Addr:           response.Paras[i+3].Strpara,
-			Port:           uint16(response.Paras[i+4].Npara),
+			ConnectionType: uint8(response.Paras[i*4+1].Npara),
+			ServerClass:    uint8(response.Paras[i*4+2].Npara),
+			Addr:           response.Paras[i*4+3].Strpara,
+			Port:           uint16(response.Paras[i*4+4].Npara),
 		})
 	}
 	response_json, _ := json.Marshal(get_server_addr_reponse)

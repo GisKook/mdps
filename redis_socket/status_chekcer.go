@@ -48,6 +48,9 @@ func GetStatusChecker() *Status_Checker {
 }
 
 func (sc *Status_Checker) Insert(tid uint64, recv_time_stamp int64) {
+	// 1. update tid_time rbtree
+	// 2. update time_tid rbtree
+
 	sc.Mutex_Tid_Time.Lock()
 	sc.Mutex_Time_Tid.Lock()
 	defer func() {
@@ -55,24 +58,30 @@ func (sc *Status_Checker) Insert(tid uint64, recv_time_stamp int64) {
 		sc.Mutex_Time_Tid.Unlock()
 	}()
 	log.Println("insert")
+	log.Printf("insert tid %d\n", tid)
+	log.Printf("insert recv_time_stamp %d\n", recv_time_stamp)
 	//1.insert into rbt_tid_time
 	//    1.1 if has ->update timevalue
 	//    1.2 if not has -> insert
 	tid_time := sc.Rbt_Tid_Time.Get(Tid_Time_Status{
 		Tid: tid,
 	})
+
+	store_time := recv_time_stamp
 	if tid_time != nil {
 		sc.Rbt_Tid_Time.Delete(Tid_Time_Status{
 			Tid: tid,
 		})
+		store_time = tid_time.(Tid_Time_Status).RecvTime
 	}
 	sc.Rbt_Tid_Time.Insert(Tid_Time_Status{
 		Tid:      tid,
 		RecvTime: recv_time_stamp,
 	})
-	// 1. if do not have then add
+
+	// sync time_tid rbtree
 	time_tid := sc.Rbt_Time_Tid.Get(Time_Tid_Status{
-		RecvTime: recv_time_stamp,
+		RecvTime: store_time,
 	})
 	if time_tid == nil {
 		sc.Rbt_Time_Tid.Insert(Time_Tid_Status{
@@ -81,15 +90,37 @@ func (sc *Status_Checker) Insert(tid uint64, recv_time_stamp int64) {
 		})
 	} else {
 		time_tid_status := time_tid.(Time_Tid_Status)
-		time_tid_status.Tids = append(time_tid_status.Tids, tid)
-		sc.Rbt_Time_Tid.Delete(Time_Tid_Status{
+		for i, _tid := range time_tid_status.Tids {
+			if _tid == tid {
+				if i == 0 {
+					time_tid_status.Tids = time_tid_status.Tids[1:]
+				} else {
+					time_tid_status.Tids[i] = time_tid_status.Tids[len(time_tid_status.Tids)-1]
+					time_tid_status.Tids = time_tid_status.Tids[:len(time_tid_status.Tids)-1]
+				}
+			}
+		}
+		_time_tid := sc.Rbt_Time_Tid.Get(Time_Tid_Status{
 			RecvTime: recv_time_stamp,
 		})
+		if _time_tid == nil {
+			sc.Rbt_Time_Tid.Insert(Time_Tid_Status{
+				RecvTime: recv_time_stamp,
+				Tids:     []uint64{tid},
+			})
+		} else {
+			time_tid_status := time_tid.(Time_Tid_Status)
+			time_tid_status.Tids = append(time_tid_status.Tids, tid)
+			sc.Rbt_Time_Tid.Delete(Time_Tid_Status{
+				RecvTime: recv_time_stamp,
+			})
 
-		sc.Rbt_Time_Tid.Insert(Time_Tid_Status{
-			RecvTime: recv_time_stamp,
-			Tids:     time_tid_status.Tids,
-		})
+			sc.Rbt_Time_Tid.Insert(Time_Tid_Status{
+				RecvTime: recv_time_stamp,
+				Tids:     time_tid_status.Tids,
+			})
+		}
+
 	}
 
 }
@@ -140,6 +171,8 @@ func (sc *Status_Checker) Check() {
 		recv_time, tids = sc.Min()
 		if len(tids) > 0 {
 			if current_time-recv_time > int64(conf.GetConf().Redis.StatusExpire) {
+				log.Println(current_time)
+				log.Println(recv_time)
 				log.Println("add off line")
 				for _, tid := range tids {
 					GetRedisSocket().Terminal_Status_Chan <- &TStatus{
