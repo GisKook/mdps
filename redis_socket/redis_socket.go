@@ -94,7 +94,6 @@ func (socket *RedisSocket) DoWork() {
 		case p := <-socket.Terminal_Status_Chan:
 			socket.Mutex_Terminal_Status.Lock()
 			socket.Terminal_Status = append(socket.Terminal_Status, p)
-			log.Println("000")
 			GetStatusChecker().Insert(p.Tid, time.Now().Unix())
 			socket.Mutex_Terminal_Status.Unlock()
 		}
@@ -123,4 +122,11 @@ func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
 func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {
 	log.Println("redis recv zmq status")
 	socket.Terminal_Status_Chan <- status
+}
+
+func (socket *RedisSocket) UpdateStatus(tid uint64) {
+	socket.RecvZmqStatus(&TStatus{
+		Tid:    tid,
+		Status: 0,
+	})
 }

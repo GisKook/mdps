@@ -120,9 +120,9 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
 	}
 
-	log.Println("hhhh")
+	try_time := uint8(0)
+cmd:
 	GetZmqServer().SendControlDown(req)
-	log.Println("dddd")
 
 	select {
 	case res := <-chan_response:
@@ -134,8 +134,13 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
-		close(chan_response)
-		delete(GetHttpServer().HttpRespones, chan_key)
-		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+		if try_time < conf.GetConf().Http.TryTime {
+			try_time++
+			goto cmd
+		} else {
+			close(chan_response)
+			delete(GetHttpServer().HttpRespones, chan_key)
+			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+		}
 	}
 }

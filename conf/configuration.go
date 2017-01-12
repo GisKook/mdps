@@ -8,6 +8,7 @@ import (
 type HttpConf struct {
 	Addr    string
 	Timeout uint8
+	TryTime uint8
 }
 
 type ZmqConf struct {

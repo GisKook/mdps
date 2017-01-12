@@ -37,6 +37,10 @@ func CheckParamters(r *http.Request, keys ...string) bool {
 }
 
 func GenerateKey(id uint64, serial uint32) uint64 {
+	return uint64(serial)
+}
+
+func _GenerateKey(id uint64, serial uint32) uint64 {
 	//	var d_serial uint64
 	//	d_serial = uint64(serial)<<32 + uint64(serial)
 	//

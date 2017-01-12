@@ -106,6 +106,8 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
 	}
 
+	try_time := uint8(0)
+cmd:
 	GetZmqServer().SendControlDown(req)
 
 	select {
@@ -114,9 +116,16 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
-		close(chan_response)
-		delete(GetHttpServer().HttpRespones, chan_key)
+		log.Println("time out")
+		if try_time < conf.GetConf().Http.TryTime {
+			log.Printf("try %d\n", try_time)
+			try_time++
+			goto cmd
+		} else {
+			close(chan_response)
+			delete(GetHttpServer().HttpRespones, chan_key)
 
-		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+		}
 	}
 }

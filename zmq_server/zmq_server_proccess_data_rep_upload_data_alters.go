@@ -14,4 +14,5 @@ func (s *ZmqServer) ProccessDataRepDataUploadAlters(command *Report.DataCommand)
 	log.Println("data up upload alters")
 	log.Println(command)
 	redis_socket.GetRedisSocket().RecvZmqDataUploadAlters(command)
+	redis_socket.GetRedisSocket().UpdateStatus(command.Tid)
 }
