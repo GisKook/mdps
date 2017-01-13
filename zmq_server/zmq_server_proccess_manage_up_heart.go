@@ -11,7 +11,6 @@ func (s *ZmqServer) ProccessManageUpHeart(command *Report.ManageCommand) {
 	uuid := command.Uuid
 	tid := command.Tid
 	status := uint8(command.Paras[0].Npara)
-	log.Println(redis_socket.GetRedisSocket())
 	redis_socket.GetRedisSocket().RecvZmqStatus(&redis_socket.TStatus{
 		Tid:    tid,
 		Uuid:   uuid,

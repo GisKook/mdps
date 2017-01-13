@@ -14,6 +14,8 @@ const SEP_MONITORS string = "+"
 const SEP_KEY_MONITORS string = ":"
 
 func (socket *RedisSocket) ProccessDataUploadMonitors() {
+	defer socket.MutexMonitors.Unlock()
+	socket.MutexMonitors.Lock()
 	if len(socket.DataUploadMonitors) > 0 {
 		log.Println("prcccess data upload monitors")
 		conn := socket.GetConn()

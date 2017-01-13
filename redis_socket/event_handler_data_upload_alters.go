@@ -15,6 +15,8 @@ const SEP_ALTERS_VALUE string = ","
 const SEP_ALTERS_KEY string = ":"
 
 func (socket *RedisSocket) ProccessDataUploadAlters() {
+	defer socket.MutexAlters.Unlock()
+	socket.MutexAlters.Lock()
 	if len(socket.DataUploadAlters) > 0 {
 		log.Println("prcccess data upload alters")
 		conn := socket.GetConn()

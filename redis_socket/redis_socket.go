@@ -17,10 +17,13 @@ type TStatus struct {
 }
 
 type RedisSocket struct {
-	conf               *conf.RedisConf
-	Pool               *redis.Pool
+	conf *conf.RedisConf
+	Pool *redis.Pool
+
 	DataUploadMonitors []*Report.DataCommand
+	MutexMonitors      sync.Mutex
 	DataUploadAlters   []*Report.DataCommand
+	MutexAlters        sync.Mutex
 
 	Mutex_Terminal_Status sync.Mutex
 	Terminal_Status       []*TStatus
@@ -29,6 +32,7 @@ type RedisSocket struct {
 	ticker *time.Ticker
 }
 
+var G_Mutex_RedisSocket sync.Mutex
 var G_RedisSocket *RedisSocket = nil
 
 func NewRedisSocket(config *conf.RedisConf) (*RedisSocket, error) {
@@ -77,6 +81,8 @@ func NewRedisSocket(config *conf.RedisConf) (*RedisSocket, error) {
 }
 
 func GetRedisSocket() *RedisSocket {
+	defer G_Mutex_RedisSocket.Unlock()
+	G_Mutex_RedisSocket.Lock()
 	return G_RedisSocket
 }
 func (socket *RedisSocket) DoWork() {
@@ -111,12 +117,16 @@ func (socket *RedisSocket) Close() {
 
 func (socket *RedisSocket) RecvZmqDataUploadMonitors(monitors *Report.DataCommand) {
 	log.Printf("<IN ZMQ>  monitors %s %d \n", monitors.Uuid, monitors.Tid)
+	socket.MutexMonitors.Lock()
 	socket.DataUploadMonitors = append(socket.DataUploadMonitors, monitors)
+	socket.MutexMonitors.Unlock()
 }
 
 func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
 	log.Printf("<IN ZMQ>  alters %s %d \n", alters.Uuid, alters.Tid)
+	socket.MutexAlters.Lock()
 	socket.DataUploadAlters = append(socket.DataUploadAlters, alters)
+	socket.MutexAlters.Unlock()
 }
 
 func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {

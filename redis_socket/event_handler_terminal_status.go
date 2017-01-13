@@ -40,7 +40,9 @@ func (socket *RedisSocket) ProccessTerminalStatus() {
 			socket.Terminal_Status[i] = nil
 		}
 
+		socket.Mutex_Terminal_Status.Lock()
 		socket.Terminal_Status = socket.Terminal_Status[:0]
+		socket.Mutex_Terminal_Status.Unlock()
 
 		conn.Do("")
 	}
