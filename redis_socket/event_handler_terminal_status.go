@@ -15,6 +15,9 @@ const (
 )
 
 func (socket *RedisSocket) ProccessTerminalStatus() {
+	defer socket.Mutex_Terminal_Status.Unlock()
+
+	socket.Mutex_Terminal_Status.Lock()
 	if len(socket.Terminal_Status) > 0 {
 		conn := socket.GetConn()
 		defer conn.Close()
@@ -40,9 +43,7 @@ func (socket *RedisSocket) ProccessTerminalStatus() {
 			socket.Terminal_Status[i] = nil
 		}
 
-		socket.Mutex_Terminal_Status.Lock()
 		socket.Terminal_Status = socket.Terminal_Status[:0]
-		socket.Mutex_Terminal_Status.Unlock()
 
 		conn.Do("")
 	}
