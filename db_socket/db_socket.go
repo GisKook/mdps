@@ -6,11 +6,14 @@ import (
 	"github.com/giskook/mdps/conf"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"sync"
 )
 
 type DbSocket struct {
 	Db *sql.DB
 }
+
+var G_MutuxDBSocket sync.Mutex
 
 var G_DBSocket *DbSocket
 
@@ -38,5 +41,7 @@ func NewDbSocket(db_config *conf.DBConf) (*DbSocket, error) {
 }
 
 func GetDBSocket() *DbSocket {
+	defer G_MutuxDBSocket.Unlock()
+	G_MutuxDBSocket.Lock()
 	return G_DBSocket
 }
