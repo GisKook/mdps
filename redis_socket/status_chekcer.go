@@ -50,8 +50,6 @@ func GetStatusChecker() *Status_Checker {
 func (sc *Status_Checker) Insert(tid uint64, recv_time_stamp int64) {
 	// 1. update tid_time rbtree
 	// 2. update time_tid rbtree
-	log.Printf("insert time_tid %d\n", sc.Rbt_Time_Tid.Len())
-	log.Printf("insert tid_time %d\n", sc.Rbt_Tid_Time.Len())
 
 	sc.Mutex_Tid_Time.Lock()
 	sc.Mutex_Time_Tid.Lock()
