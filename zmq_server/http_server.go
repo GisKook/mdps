@@ -5,6 +5,7 @@ import (
 	"github.com/giskook/mdps/pb"
 	"log"
 	"net/http"
+	"sync"
 )
 
 type Http_server struct {
@@ -13,9 +14,12 @@ type Http_server struct {
 	SerialID     uint32
 }
 
+var G_MutexHttpServer sync.Mutex
 var G_HttpServer *Http_server
 
 func NewHttpServer(config *conf.HttpConf) *Http_server {
+	defer G_MutexHttpServer.Unlock()
+	G_MutexHttpServer.Lock()
 	G_HttpServer = &Http_server{
 		Addr:         config.Addr,
 		HttpRespones: make(map[uint64]chan *Report.ControlCommand),
@@ -48,5 +52,8 @@ func (server *Http_server) Start() {
 }
 
 func GetHttpServer() *Http_server {
+	defer G_MutexHttpServer.Unlock()
+	G_MutexHttpServer.Lock()
+
 	return G_HttpServer
 }

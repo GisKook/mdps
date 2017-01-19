@@ -153,18 +153,17 @@ func (sc *Status_Checker) Del(recv_time_stamp int64) {
 	}()
 
 	//1.del the rbt_time_tid
-	time_tid_item := sc.Rbt_Time_Tid.Get(Time_Tid_Status{
-		RecvTime: recv_time_stamp,
-	})
-	sc.Rbt_Time_Tid.Delete(Time_Tid_Status{
+	time_tid_item := sc.Rbt_Time_Tid.Delete(Time_Tid_Status{
 		RecvTime: recv_time_stamp,
 	})
 	log.Printf("after del have %d time_tid\n", sc.Rbt_Time_Tid.Len())
-	tids_status := time_tid_item.(Time_Tid_Status)
-	for _, _tid := range tids_status.Tids {
-		sc.Rbt_Tid_Time.Delete(Tid_Time_Status{
-			Tid: _tid,
-		})
+	if time_tid_item != nil {
+		tids_status := time_tid_item.(Time_Tid_Status)
+		for _, _tid := range tids_status.Tids {
+			sc.Rbt_Tid_Time.Delete(Tid_Time_Status{
+				Tid: _tid,
+			})
+		}
 	}
 	log.Printf("after del have %d tid_time \n", sc.Rbt_Tid_Time.Len())
 }

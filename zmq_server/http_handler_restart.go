@@ -62,6 +62,7 @@ cmd:
 	case res := <-chan_response:
 		value := uint8((*Report.ControlCommand)(res).Paras[0].Npara)
 		fmt.Fprint(w, EncodingGeneralResponse(value))
+		log.Println("restart ...")
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):

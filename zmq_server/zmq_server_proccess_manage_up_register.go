@@ -19,6 +19,7 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 	s_tid := strconv.FormatUint(tid, 10)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_tid, zmq.SNDMORE)
 	s_w_c_id := strconv.FormatUint(w_c_id, 10)
+	log.Printf("xxxxx %s\n", s_w_c_id)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_w_c_id, zmq.SNDMORE)
 
 	log.Println(command.Cpuid)

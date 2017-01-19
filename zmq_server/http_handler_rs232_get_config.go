@@ -57,6 +57,7 @@ func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 }
 
 func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Rs232GetConfig")
 	r.ParseForm()
 	log.Println(r.Form)
 	log.Println(r.PostForm)

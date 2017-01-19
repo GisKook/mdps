@@ -18,6 +18,8 @@ var G_MutuxDBSocket sync.Mutex
 var G_DBSocket *DbSocket
 
 func NewDbSocket(db_config *conf.DBConf) (*DbSocket, error) {
+	defer G_MutuxDBSocket.Unlock()
+	G_MutuxDBSocket.Lock()
 	//user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
 	log.Println(db_config)
 	conn_string := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?autocommit=true",
@@ -26,6 +28,7 @@ func NewDbSocket(db_config *conf.DBConf) (*DbSocket, error) {
 	log.Println(conn_string)
 
 	db, err := sql.Open("mysql", conn_string)
+	db.SetMaxOpenConns(100)
 
 	if err != nil {
 		log.Println(err)
