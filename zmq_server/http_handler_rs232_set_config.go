@@ -115,7 +115,7 @@ cmd:
 
 	select {
 	case res := <-chan_response:
-		result := (*Report.ControlCommand)(res).Paras[0].Npara
+		result := (*Report.ControlCommand)(res).Paras[1].Npara
 		fmt.Fprint(w, EncodingGeneralResponse(uint8(result)))
 
 		break

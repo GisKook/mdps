@@ -69,6 +69,7 @@ func CheckParamtersErr(batch_add_alter *BatchAddAlter) bool {
 }
 
 func BatchAddAlterHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("BatchAddAlterHandler")
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var batch_add_alter BatchAddAlter

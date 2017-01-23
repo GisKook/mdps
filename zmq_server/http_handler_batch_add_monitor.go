@@ -54,6 +54,7 @@ func CheckParamtersBatchAddMonitorErr(batch_add_monitor *BatchAddMonitor) bool {
 }
 
 func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("BatchAddMonitorHandler")
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var batch_add_monitor BatchAddMonitor
@@ -62,6 +63,7 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer r.Body.Close()
+	log.Println(batch_add_monitor)
 	if CheckParamtersBatchAddMonitorErr(&batch_add_monitor) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 		return

@@ -77,6 +77,7 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(rs232_get_config)
+	log.Printf("Rs232GetConfig plc_id %d\n", *rs232_get_config.Plc_id)
 
 	defer func() {
 		if x := recover(); x != nil {

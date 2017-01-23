@@ -8,7 +8,7 @@ import (
 
 func (s *ZmqServer) ProccessDataRepDataUploadMonitors(command *Report.DataCommand) {
 	log.Println("data up upload monitors")
-	log.Println(command)
+	//log.Println(command)
 	redis_socket.GetRedisSocket().RecvZmqDataUploadMonitors(command)
 	redis_socket.GetRedisSocket().UpdateStatus(command.Tid)
 }

@@ -22,12 +22,12 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 		conn := socket.GetConn()
 		defer conn.Close()
 
-		log.Println(len(socket.DataUploadAlters))
+		//log.Println(len(socket.DataUploadAlters))
 		for _, data_command := range socket.DataUploadAlters {
 			alter_key := PREFIX_ALTERS + strconv.FormatUint(data_command.Tid, 10) + SEP_ALTERS_KEY + strconv.FormatUint(uint64(data_command.SerialPort), 10)
 			conn.Send("DEL", alter_key)
 			conn.Send("EXPIRE", alter_key)
-			log.Println(len(data_command.Alters))
+			//log.Println(len(data_command.Alters))
 			for _, alter := range data_command.Alters {
 				//		reader := bytes.NewReader(alter.Data)
 				if alter.DataType == 0 {
