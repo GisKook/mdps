@@ -1,0 +1,11 @@
+{
+    "Server": {
+        "Addr": "127.0.0.1:8777",
+        "ReadLimit": 30000,
+        "WriteLimit": 30000
+    },
+   "Client":{
+	"HeartInterval":30
+    }
+
+}
