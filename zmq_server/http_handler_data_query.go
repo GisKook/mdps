@@ -138,7 +138,8 @@ cmd:
 			goto cmd
 		} else {
 			close(chan_response)
-			delete(GetHttpServer().HttpRespones, chan_key)
+			var once sync.Once
+			once.Do(func() { delete(GetHttpServer().HttpRespones, chan_key) })
 			fmt.Fprint(w, EncodingDataQueryResponse(&DataQueryResponse{
 				Result: HTTP_RESPONSE_RESULT_TIMEOUT,
 				Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_TIMEOUT],

@@ -1,8 +1,8 @@
 {
     "Http":{
         "Addr":":8881",
-        "Timeout":10, 
-	"TryTime":3
+        "Timeout":5, 
+	"TryTime":2
     },
     "Zmq": {
         "TerminalManageUp":"tcp://*:1901",
@@ -16,7 +16,7 @@
         "Addr": "127.0.0.1:6379",
         "MaxIdle":100,
         "IdleTimeOut":240,
-        "Passwd":"",
+        "Passwd":"redis",
         "TranInterval":5,
         "MonitorsKeyExpire":20,
         "AltersKeyExpire":20,
