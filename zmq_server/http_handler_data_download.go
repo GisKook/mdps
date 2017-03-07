@@ -23,9 +23,8 @@ type DataDownload struct {
 }
 
 func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("DataDownloadHandler")
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var data_download DataDownload
 	err := decoder.Decode(&data_download)
@@ -33,7 +32,6 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer r.Body.Close()
-	log.Println(data_download)
 
 	if data_download.Plc_id == nil ||
 		data_download.Serial == nil ||
@@ -46,7 +44,6 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(data_download)
 
 	defer func() {
 		if x := recover(); x != nil {
@@ -55,7 +52,6 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	data, _ := base64.StdEncoding.DecodeString(*data_download.Data)
-	log.Println(data)
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *data_download.Plc_id,

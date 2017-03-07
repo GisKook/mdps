@@ -116,21 +116,18 @@ func (socket *RedisSocket) Close() {
 }
 
 func (socket *RedisSocket) RecvZmqDataUploadMonitors(monitors *Report.DataCommand) {
-	log.Printf("<IN ZMQ>  monitors %s %d \n", monitors.Uuid, monitors.Tid)
 	socket.MutexMonitors.Lock()
 	socket.DataUploadMonitors = append(socket.DataUploadMonitors, monitors)
 	socket.MutexMonitors.Unlock()
 }
 
 func (socket *RedisSocket) RecvZmqDataUploadAlters(alters *Report.DataCommand) {
-	log.Printf("<IN ZMQ>  alters %s %d \n", alters.Uuid, alters.Tid)
 	socket.MutexAlters.Lock()
 	socket.DataUploadAlters = append(socket.DataUploadAlters, alters)
 	socket.MutexAlters.Unlock()
 }
 
 func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {
-	log.Println("redis recv zmq status")
 	socket.Terminal_Status_Chan <- status
 }
 

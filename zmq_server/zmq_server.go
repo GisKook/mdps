@@ -32,7 +32,6 @@ var G_ZmqServer *ZmqServer
 
 func (s *ZmqServer) Init(config *conf.ZmqConf) bool {
 	s.Socket_Terminal_Manage_Up_Socket, _ = zmq.NewSocket(zmq.PULL)
-	log.Printf("Socket_Terminal_Manage_Up_Socket %x\n", s.Socket_Terminal_Manage_Up_Socket)
 	s.Socket_Terminal_Manage_Up_Socket.Bind(config.TerminalManageUp)
 	s.Socket_Terminal_Manage_Down_Socket, _ = zmq.NewSocket(zmq.PUB)
 	s.Socket_Terminal_Manage_Down_Socket.Bind(config.TerminalManageDown)
@@ -72,7 +71,6 @@ func GetZmqServer() *ZmqServer {
 func (s *ZmqServer) RecvManageUp() {
 	for {
 		p, _ := s.Socket_Terminal_Manage_Up_Socket.Recv(0)
-		log.Println("recv manage up from zmq")
 		s.Socket_Terminal_Manage_Up_Chan <- p
 	}
 }
@@ -80,7 +78,6 @@ func (s *ZmqServer) RecvManageUp() {
 func (s *ZmqServer) RecvControlUp() {
 	for {
 		p, _ := s.Socket_Terminal_Control_Up_Socket.Recv(0)
-		log.Println("recv control up from zmq")
 		s.Socket_Terminal_Control_Up_Chan <- p
 	}
 }
@@ -88,13 +85,11 @@ func (s *ZmqServer) RecvControlUp() {
 func (s *ZmqServer) RecvDataUp() {
 	for {
 		p, _ := s.Socket_Terminal_Data_Up_Socket.Recv(0)
-		log.Println("recv data up from zmq")
 		s.Socket_Terminal_Data_Up_Chan <- p
 	}
 }
 
 func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
-	log.Println("SendControlDown")
 	uuid := command.Uuid
 	s.Socket_Terminal_Control_Down_Socket.Send(uuid, zmq.SNDMORE)
 
@@ -111,7 +106,6 @@ func (s *ZmqServer) Run() {
 		s.Socket_Terminal_Manage_Up_Socket.Close()
 		s.Socket_Terminal_Manage_Down_Socket.Close()
 	}()
-	log.Println("zmq run")
 
 	go s.RecvManageUp()
 	go s.RecvControlUp()
@@ -122,13 +116,10 @@ func (s *ZmqServer) Run() {
 		case <-s.ExitChan:
 			return
 		case t_m_u := <-s.Socket_Terminal_Manage_Up_Chan:
-			log.Println("manage recv chan")
 			s.ProccessManageUp(t_m_u)
 		case t_c_u := <-s.Socket_Terminal_Control_Up_Chan:
-			log.Println("control recv chan")
 			s.ProccessControlUp(t_c_u)
 		case t_d_u := <-s.Socket_Terminal_Data_Up_Chan:
-			log.Println("data recv chan")
 			s.ProccessDataUp(t_d_u)
 		}
 	}
@@ -139,10 +130,8 @@ func (s *ZmqServer) Stop() {
 }
 
 func (s *ZmqServer) ProccessManageUp(p string) {
-	log.Println("proccess manage up")
 	command := &Report.ManageCommand{}
 	err := proto.Unmarshal([]byte(p), command)
-	log.Println(command)
 	if err != nil {
 		log.Println("unmarshal error")
 	} else {

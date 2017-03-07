@@ -5,21 +5,17 @@ import (
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
 	zmq "github.com/pebbe/zmq4"
-	"log"
 	"strconv"
 )
 
 func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {
-	log.Println(command)
 	uuid := command.Uuid
 	s.Socket_Terminal_Manage_Down_Socket.Send(uuid, zmq.SNDMORE)
 
-	log.Println("proccess login")
 	tid := command.Tid
 	s_tid := strconv.FormatUint(tid, 10)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_tid, zmq.SNDMORE)
 	check := db_socket.GetDBSocket().CheckPlcID(tid)
-	log.Println(check)
 	if check == 1 {
 		check = 0
 	} else {

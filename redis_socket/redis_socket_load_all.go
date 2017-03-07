@@ -41,15 +41,12 @@ func (socket *RedisSocket) LoadAll() {
 		CheckError(e)
 		cursor_keys, e = redis.Values(value, e)
 		CheckError(e)
-		log.Println(cursor_keys)
 		cursor, e = redis.String(cursor_keys[0], nil)
 		CheckError(e)
 		keys, e = redis.Strings(cursor_keys[1], nil)
 		keys = PreTreatmentKeys(keys)
 		CheckError(e)
 		socket.PipelineGetValue(keys)
-		log.Println(cursor)
-		log.Println(keys)
 		if cursor == "0" {
 			return
 		}
@@ -80,7 +77,6 @@ func (socket *RedisSocket) PipelineGetValue(keys []string) {
 			}
 
 			v, _ := redis.Strings(v_redis, nil)
-			log.Println(v)
 
 			if err != nil {
 				log.Println("unmarshal error PipelineGetValue")

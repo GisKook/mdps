@@ -49,6 +49,7 @@ func EncodeGetServerAddrResponse(response *Report.ControlCommand) string {
 }
 
 func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetServerAddrHandler")
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var get_server_addr GetServerAddr
@@ -65,8 +66,6 @@ func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println("GetServerAddrHandler")
-	log.Println(get_server_addr)
 
 	defer func() {
 		if x := recover(); x != nil {

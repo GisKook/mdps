@@ -5,7 +5,6 @@ import (
 	//"encoding/binary"
 	//	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/base"
-	"log"
 	"strconv"
 )
 
@@ -18,7 +17,6 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 	defer socket.MutexAlters.Unlock()
 	socket.MutexAlters.Lock()
 	if len(socket.DataUploadAlters) > 0 {
-		log.Println("prcccess data upload alters")
 		conn := socket.GetConn()
 		defer conn.Close()
 

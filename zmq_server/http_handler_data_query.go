@@ -50,6 +50,7 @@ func EncodingDataQueryResponse(data_query_response *DataQueryResponse) string {
 }
 
 func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("DataQueryHandler")
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var data_query DataQuery
@@ -58,7 +59,6 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer r.Body.Close()
-	log.Println(data_query)
 	if CheckParamtersDataQueryErr(&data_query) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 		return

@@ -6,12 +6,10 @@ import (
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
 	zmq "github.com/pebbe/zmq4"
-	"log"
 	"strconv"
 )
 
 func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
-	log.Println("manage up register")
 	uuid := command.Uuid
 	tid := command.Tid
 	w_c_id := command.Paras[0].Npara*100000 + command.Paras[1].Npara
@@ -19,10 +17,8 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 	s_tid := strconv.FormatUint(tid, 10)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_tid, zmq.SNDMORE)
 	s_w_c_id := strconv.FormatUint(w_c_id, 10)
-	log.Printf("xxxxx %s\n", s_w_c_id)
 	s.Socket_Terminal_Manage_Down_Socket.Send(s_w_c_id, zmq.SNDMORE)
 
-	log.Println(command.Cpuid)
 	plc_id := db_socket.GetDBSocket().GetPlcID(base.GetString(command.Cpuid)[16:])
 
 	para := []*Report.Param{

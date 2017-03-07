@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -24,8 +23,6 @@ type Rs485SetConfig struct {
 
 func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var rs485_set_cnfig Rs485SetConfig
 	err := decoder.Decode(&rs485_set_cnfig)
@@ -46,7 +43,6 @@ func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(rs485_set_cnfig)
 
 	defer func() {
 		if x := recover(); x != nil {

@@ -78,7 +78,6 @@ func BatchAddAlterHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer r.Body.Close()
-	log.Println(batch_add_alter)
 	if CheckParamtersErr(&batch_add_alter) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 		return

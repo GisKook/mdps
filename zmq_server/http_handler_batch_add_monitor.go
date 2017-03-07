@@ -63,7 +63,6 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	defer r.Body.Close()
-	log.Println(batch_add_monitor)
 	if CheckParamtersBatchAddMonitorErr(&batch_add_monitor) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 		return
@@ -130,7 +129,6 @@ cmd:
 	case res := <-chan_response:
 		//	serial_port := uint8((*Report.ControlCommand)(res).Paras[0].Npara)
 		result := uint8((*Report.ControlCommand)(res).Paras[1].Npara)
-		log.Printf("normal result %d\n", result)
 
 		fmt.Fprint(w, EncodingGeneralResponse(result))
 

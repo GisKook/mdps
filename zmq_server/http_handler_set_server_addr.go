@@ -48,9 +48,8 @@ func CheckParamtersSetServerAddrErr(server_addrs *SetServer_Addr) bool {
 }
 
 func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("SetServerAddrHandler")
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var set_server_addr SetServer_Addr
 	err := decoder.Decode(&set_server_addr)
@@ -64,7 +63,6 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(set_server_addr)
 
 	defer func() {
 		if x := recover(); x != nil {

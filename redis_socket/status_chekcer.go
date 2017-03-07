@@ -3,7 +3,6 @@ package redis_socket
 import (
 	"github.com/HuKeping/rbtree"
 	"github.com/giskook/mdps/conf"
-	"log"
 	"sync"
 	"time"
 )
@@ -79,15 +78,12 @@ func (sc *Status_Checker) Insert(tid uint64, recv_time_stamp int64) {
 		RecvTime: store_time,
 	})
 	if time_tid == nil {
-		log.Println("time_tid is nil")
 		sc.Rbt_Time_Tid.Insert(Time_Tid_Status{
 			RecvTime: recv_time_stamp,
 			Tids:     []uint64{tid},
 		})
 	} else {
-		log.Println("time_tid is not nil")
 		time_tid_status := time_tid.(Time_Tid_Status)
-		log.Println(time_tid_status.Tids)
 		for i, _tid := range time_tid_status.Tids {
 			if _tid == tid {
 				time_tid_status.Tids[i] = time_tid_status.Tids[len(time_tid_status.Tids)-1]
@@ -156,7 +152,6 @@ func (sc *Status_Checker) Del(recv_time_stamp int64) {
 	time_tid_item := sc.Rbt_Time_Tid.Delete(Time_Tid_Status{
 		RecvTime: recv_time_stamp,
 	})
-	log.Printf("after del have %d time_tid\n", sc.Rbt_Time_Tid.Len())
 	if time_tid_item != nil {
 		tids_status := time_tid_item.(Time_Tid_Status)
 		for _, _tid := range tids_status.Tids {
@@ -165,7 +160,6 @@ func (sc *Status_Checker) Del(recv_time_stamp int64) {
 			})
 		}
 	}
-	log.Printf("after del have %d tid_time \n", sc.Rbt_Tid_Time.Len())
 }
 
 func (sc *Status_Checker) Min() (int64, []uint64) {
@@ -191,9 +185,6 @@ func (sc *Status_Checker) Check() {
 		recv_time, tids = sc.Min()
 		if len(tids) > 0 {
 			if current_time-recv_time > int64(conf.GetConf().Redis.StatusExpire) {
-				log.Printf("curr %d\n", current_time)
-				log.Println("recv %d\n", recv_time)
-				log.Println("add off line")
 				for _, tid := range tids {
 					GetRedisSocket().Terminal_Status_Chan <- &TStatus{
 						Tid:    tid,

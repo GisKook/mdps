@@ -25,9 +25,8 @@ type Rs232SetConfig struct {
 }
 
 func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Rs232SetConfig")
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var rs232_set_cnfig Rs232SetConfig
 	err := decoder.Decode(&rs232_set_cnfig)
@@ -50,10 +49,10 @@ func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(rs232_set_cnfig)
 
 	defer func() {
 		if x := recover(); x != nil {
+			log.Println(x)
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()

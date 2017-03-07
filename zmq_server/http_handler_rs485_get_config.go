@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -52,8 +51,6 @@ func EncodeRs485GetConfigResponse(response *Report.ControlCommand) string {
 
 func Rs485GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var rs485_get_config Rs485GetConfig
 	err := decoder.Decode(&rs485_get_config)
@@ -69,7 +66,6 @@ func Rs485GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(rs485_get_config)
 
 	defer func() {
 		if x := recover(); x != nil {

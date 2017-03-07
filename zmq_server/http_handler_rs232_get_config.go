@@ -59,8 +59,6 @@ func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Rs232GetConfig")
 	r.ParseForm()
-	log.Println(r.Form)
-	log.Println(r.PostForm)
 	decoder := json.NewDecoder(r.Body)
 	var rs232_get_config Rs232GetConfig
 	err := decoder.Decode(&rs232_get_config)
@@ -76,11 +74,10 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	log.Println(rs232_get_config)
-	log.Printf("Rs232GetConfig plc_id %d\n", *rs232_get_config.Plc_id)
 
 	defer func() {
 		if x := recover(); x != nil {
+			log.Println(x)
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
