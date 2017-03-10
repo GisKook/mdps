@@ -10,6 +10,23 @@ import (
 	"sync"
 )
 
+const (
+	SOCKET_TERMINAL_MANAGE_DOWN_REGISTER uint8 = 0
+	SOCKET_TERMINAL_MANAGE_DOWN_LOGIN    uint8 = 1
+)
+
+type ZmqSendValueLogin struct {
+	Uuid  string
+	Tid   uint64
+	Check uint8
+}
+
+type ZmqSendValue struct {
+	SocketType       uint8
+	SocketValue      string
+	SocketValueLogin *ZmqSendValueLogin
+}
+
 type ZmqServer struct {
 	Socket_Terminal_Manage_Up_Socket   *zmq.Socket
 	Socket_Terminal_Manage_Down_Socket *zmq.Socket
@@ -25,6 +42,8 @@ type ZmqServer struct {
 	Socket_Terminal_Data_Up_Chan   chan string
 
 	ExitChan chan struct{}
+
+	SendChan chan *ZmqSendValue
 }
 
 var mutex_server sync.Mutex
@@ -57,6 +76,7 @@ func NewZmqServer() *ZmqServer {
 			Socket_Terminal_Data_Up_Chan:      make(chan string),
 
 			ExitChan: make(chan struct{}),
+			SendChan: make(chan *ZmqSendValue),
 		}
 
 	return G_ZmqServer
@@ -89,6 +109,11 @@ func (s *ZmqServer) RecvDataUp() {
 	}
 }
 
+func (s *ZmqServer) CollectSend(value *ZmqSendValue) {
+	log.Println("CollectSend")
+	s.SendChan <- value
+}
+
 func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
 	uuid := command.Uuid
 	s.Socket_Terminal_Control_Down_Socket.Send(uuid, zmq.SNDMORE)
@@ -101,6 +126,20 @@ func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
 	s.Socket_Terminal_Control_Down_Socket.Send(string(data), 0)
 }
 
+func (s *ZmqServer) ProccessSend() {
+	for {
+		select {
+		case p := <-s.SendChan:
+			if p.SocketType == SOCKET_TERMINAL_MANAGE_DOWN_REGISTER {
+				s.Socket_Terminal_Manage_Down_Socket.Send(p.SocketValue, 0)
+			} else if p.SocketType == SOCKET_TERMINAL_MANAGE_DOWN_LOGIN {
+				s.SendFeedbackLogin(p.SocketValueLogin)
+			}
+		}
+
+	}
+}
+
 func (s *ZmqServer) Run() {
 	defer func() {
 		s.Socket_Terminal_Manage_Up_Socket.Close()
@@ -110,6 +149,7 @@ func (s *ZmqServer) Run() {
 	go s.RecvManageUp()
 	go s.RecvControlUp()
 	go s.RecvDataUp()
+	go s.ProccessSend()
 
 	for {
 		select {

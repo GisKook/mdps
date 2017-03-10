@@ -8,13 +8,31 @@ import (
 	"strconv"
 )
 
+func (s *ZmqServer) SendFeedbackLogin(login *ZmqSendValueLogin) {
+	tid := strconv.FormatUint(login.Tid, 10)
+
+	s.Socket_Terminal_Manage_Down_Socket.Send(login.Uuid, zmq.SNDMORE)
+	s.Socket_Terminal_Manage_Down_Socket.Send(tid, zmq.SNDMORE)
+	para := []*Report.Param{
+		&Report.Param{
+			Type:  Report.Param_UINT8,
+			Npara: uint64(login.Check),
+		},
+	}
+	command_rep := &Report.ManageCommand{
+		Tid:   login.Tid,
+		Type:  Report.ManageCommand_CMT_REP_LOGIN,
+		Paras: para,
+	}
+
+	data, _ := proto.Marshal(command_rep)
+	s.Socket_Terminal_Manage_Down_Socket.Send(string(data), 0)
+}
+
 func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {
 	uuid := command.Uuid
-	s.Socket_Terminal_Manage_Down_Socket.Send(uuid, zmq.SNDMORE)
 
 	tid := command.Tid
-	s_tid := strconv.FormatUint(tid, 10)
-	s.Socket_Terminal_Manage_Down_Socket.Send(s_tid, zmq.SNDMORE)
 	check := db_socket.GetDBSocket().CheckPlcID(tid)
 	if check == 1 {
 		check = 0
@@ -22,18 +40,12 @@ func (s *ZmqServer) ProccessManageUpLogin(command *Report.ManageCommand) {
 		check = 1
 	}
 
-	para := []*Report.Param{
-		&Report.Param{
-			Type:  Report.Param_UINT8,
-			Npara: uint64(check),
+	s.CollectSend(&ZmqSendValue{
+		SocketType: SOCKET_TERMINAL_MANAGE_DOWN_LOGIN,
+		SocketValueLogin: &ZmqSendValueLogin{
+			Uuid:  uuid,
+			Tid:   tid,
+			Check: check,
 		},
-	}
-	command_rep := &Report.ManageCommand{
-		Tid:   tid,
-		Type:  Report.ManageCommand_CMT_REP_LOGIN,
-		Paras: para,
-	}
-
-	data, _ := proto.Marshal(command_rep)
-	s.Socket_Terminal_Manage_Down_Socket.Send(string(data), 0)
+	})
 }

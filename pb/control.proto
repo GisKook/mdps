@@ -39,6 +39,9 @@ message ControlCommand {
 
         CMT_REQ_SET_SERVER_ADDR = 0x0005;
         CMT_REP_SET_SERVER_ADDR = 0x8005;
+
+	CMT_REQ_TRANSPARENT_TRANSMISSION = 0x0015;
+	CMT_REP_TRANSPARENT_TRANSMISSION = 0x8015;
     }
 
     string  uuid = 1;
