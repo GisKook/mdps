@@ -91,6 +91,12 @@ const (
 	// rs485 set config
 	HTTP_RS485_SET_CONFIG string = "/plc/rs485_set_config"
 
+	// transparent transmission
+	HTTP_TRANSPARENT_TRANSMISSION string = "/plc/transparent_transmission"
+
+	// transparent transmission
+	HTTP_RELEASE_TRANSPARENT_TRANSMISSION string = "/plc/release_transparent_transmission"
+
 	//////////////RESPONSE////////////////
 	//HTTP_RESPONSE_RESULT               string = "result"
 	HTTP_RESPONSE_RESULT_SUCCESS uint8 = 0
