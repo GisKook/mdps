@@ -97,6 +97,9 @@ const (
 	// transparent transmission
 	HTTP_RELEASE_TRANSPARENT_TRANSMISSION string = "/plc/release_transparent_transmission"
 
+	// query rouer status
+	HTTP_QUERY_ROUTER_STATUS string = "/plc/query_router_status"
+
 	//////////////RESPONSE////////////////
 	//HTTP_RESPONSE_RESULT               string = "result"
 	HTTP_RESPONSE_RESULT_SUCCESS uint8 = 0

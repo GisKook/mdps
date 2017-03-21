@@ -211,6 +211,10 @@ func (s *ZmqServer) ProccessControlUp(p string) {
 			s.ProccessControlRepGetServerAddr(command)
 		case Report.ControlCommand_CMT_REP_SET_SERVER_ADDR:
 			s.ProccessControlRepSetServerAddr(command)
+		case Report.ControlCommand_CMT_REP_TRANSPARENT_TRANSMISSION:
+			s.ProccessControlRepTransparentTransmission(command)
+		case Report.ControlCommand_CMT_REP_RELEASE_TRANSPARENT_TRANSMISSION:
+			s.ProccessControlRepReleaseTransparentTransmission(command)
 		}
 	}
 }
