@@ -7,6 +7,7 @@ import (
 	"github.com/giskook/mdps/pb"
 	"log"
 	"net/http"
+	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -77,7 +78,7 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		if x := recover(); x != nil {
-			log.Println(x)
+			log.Printf("%s %s\n", x, debug.Stack())
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
