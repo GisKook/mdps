@@ -25,6 +25,10 @@ type ZmqSendValue struct {
 	SocketType       uint8
 	SocketValue      string
 	SocketValueLogin *ZmqSendValueLogin
+	// register
+	Uuid               string
+	Tid                string
+	WorkerConnectionID string
 }
 
 type ZmqServer struct {
@@ -131,6 +135,10 @@ func (s *ZmqServer) ProccessSend() {
 		select {
 		case p := <-s.SendChan:
 			if p.SocketType == SOCKET_TERMINAL_MANAGE_DOWN_REGISTER {
+
+				s.Socket_Terminal_Manage_Down_Socket.Send(p.Uuid, zmq.SNDMORE)
+				s.Socket_Terminal_Manage_Down_Socket.Send(p.Tid, zmq.SNDMORE)
+				s.Socket_Terminal_Manage_Down_Socket.Send(p.WorkerConnectionID, zmq.SNDMORE)
 				s.Socket_Terminal_Manage_Down_Socket.Send(p.SocketValue, 0)
 			} else if p.SocketType == SOCKET_TERMINAL_MANAGE_DOWN_LOGIN {
 				s.SendFeedbackLogin(p.SocketValueLogin)
