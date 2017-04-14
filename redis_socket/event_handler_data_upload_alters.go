@@ -4,7 +4,7 @@ import (
 	//	"bytes"
 	//"encoding/binary"
 	//	"github.com/giskook/mdps/conf"
-	"github.com/giskook/mdps/base"
+	//"github.com/giskook/mdps/base"
 	"strconv"
 )
 
@@ -39,8 +39,8 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 							strconv.Itoa(int(alter.DataType))+
 							SEP_ALTERS+
 							strconv.Itoa(int(alter.DataLen)),
-						//append([]byte{byte(alter.Status)}, alter.Data...))
-						base.GetString(append([]byte{byte(alter.Status)}, alter.Data...)))
+						append([]byte{byte(alter.Status)}, alter.Data...))
+					//base.GetString(append([]byte{byte(alter.Status)}, alter.Data...)))
 
 					//	}
 				} else if alter.DataType == 1 {

@@ -4,7 +4,7 @@ import (
 	//	"bytes"
 	//	"encoding/binary"
 	//	"github.com/giskook/mdps/conf"
-	"github.com/giskook/mdps/base"
+	//"github.com/giskook/mdps/base"
 	//"log"
 	"strconv"
 )
@@ -45,8 +45,8 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 							strconv.Itoa(int(monitor.DataType))+
 							SEP_MONITORS+
 							strconv.Itoa(int(monitor.DataLen)),
-						//	monitor.Data)
-						base.GetString(monitor.Data))
+						monitor.Data)
+					//base.GetString(monitor.Data))
 					//		}
 				} else if monitor.DataType == 1 {
 					//		var word_value uint16

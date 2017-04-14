@@ -55,6 +55,7 @@ func TransparentTransmissionHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	log.Println(*transparent_transmission.Serial)
 
 	defer func() {
 		if x := recover(); x != nil {

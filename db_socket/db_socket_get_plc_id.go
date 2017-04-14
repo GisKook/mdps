@@ -8,7 +8,10 @@ import (
 const sql_get_plc_id string = "SELECT ID FROM DMS_ROUTER WHERE CPUID=?"
 
 func (db *DbSocket) GetPlcID(cpuid string) uint64 {
+	log.Println("--------select id---------")
 	log.Println(cpuid)
+	log.Println(sql_get_plc_id)
+	log.Println("--------select id---------")
 	stmt, err := db.Db.Prepare(sql_get_plc_id)
 	defer stmt.Close()
 	if err != nil {

@@ -47,5 +47,5 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 	w_c_id := command.Paras[0].Npara*100000 + command.Paras[1].Npara
 	s_tid := strconv.FormatUint(tid, 10)
 	s_w_c_id := strconv.FormatUint(w_c_id, 10)
-	go s.Do(base.GetString(command.Cpuid)[16:], uuid, s_tid, s_w_c_id)
+	go s.Do(base.GetString(command.Cpuid)[0:], uuid, s_tid, s_w_c_id)
 }

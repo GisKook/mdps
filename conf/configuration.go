@@ -28,6 +28,7 @@ type RedisConf struct {
 	MonitorsKeyExpire uint32
 	AltersKeyExpire   uint32
 	StatusExpire      uint32
+	SyncInterval      uint32
 }
 
 type DBConf struct {

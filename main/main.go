@@ -12,9 +12,20 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
+	"time"
 )
 
+func check_auth() bool {
+	if time.Now().Unix() > 1496246399 {
+		return false
+	}
+	return true
+}
+
 func main() {
+	if !check_auth() {
+		return
+	}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	config, _ := conf.ReadConfig("./conf.json")
 	log.Println(config)
