@@ -21,7 +21,7 @@
         "MonitorsKeyExpire":20,
         "AltersKeyExpire":20,
         "StatusExpire":150, 
-	"SyncInterval":600
+	"SyncInterval":5
     },
 
     "DB":{ 

@@ -1,5 +1,9 @@
 package base
 
+import (
+	"strings"
+)
+
 var hex_table [256]string = [256]string{
 	"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f",
 	"10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f",
@@ -22,6 +26,17 @@ func GetString(value []byte) string {
 	var result string = ""
 	for _, v := range value {
 		result += hex_table[v]
+	}
+
+	return result
+}
+
+func FilterStringArray(string_array []string, specified_string string) []string {
+	var result []string
+	for _, value := range string_array {
+		if strings.Contains(value, specified_string) {
+			result = append(result, value)
+		}
 	}
 
 	return result

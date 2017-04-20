@@ -7,11 +7,15 @@ import (
 	//"github.com/giskook/mdps/base"
 	//"log"
 	"strconv"
+	"time"
 )
 
-const PREFIX_MONITORS string = "TMDATA:"
-const SEP_MONITORS string = "+"
-const SEP_KEY_MONITORS string = ":"
+const (
+	PREFIX_MONITORS  string = "TMDATA:"
+	SEP_MONITORS     string = "+"
+	SEP_KEY_MONITORS string = ":"
+	TIMESTAMP        string = "TIMESTAMP"
+)
 
 func (socket *RedisSocket) ProccessDataUploadMonitors() {
 	defer socket.MutexMonitors.Unlock()
@@ -29,6 +33,7 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 					strconv.FormatUint(uint64(data_command.SerialPort), 10)
 			conn.Send("DEL", monitor_key)
 			conn.Send("EXPIRE", monitor_key)
+			conn.Send("HMSET", TIMESTAMP, time.Now().Unix())
 
 			//log.Println(len(data_command.Monitors))
 			for _, monitor := range data_command.Monitors {

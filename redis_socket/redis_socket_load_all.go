@@ -2,28 +2,11 @@ package redis_socket
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"github.com/giskook/mdps/base"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 )
-
-func CheckError(err error) {
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func PreTreatmentKeys(keys []string) []string {
-	var result []string
-	for _, key := range keys {
-		if !strings.Contains(key, PREFIX_STATUS) {
-			result = append(result, key)
-		}
-	}
-
-	return keys
-}
 
 func (socket *RedisSocket) LoadAll() {
 	conn := socket.GetConn()
@@ -38,14 +21,14 @@ func (socket *RedisSocket) LoadAll() {
 	var e error
 	for {
 		value, e = conn.Do("SCAN", cursor)
-		CheckError(e)
+		base.CheckError(e)
 		cursor_keys, e = redis.Values(value, e)
-		CheckError(e)
+		base.CheckError(e)
 		cursor, e = redis.String(cursor_keys[0], nil)
-		CheckError(e)
+		base.CheckError(e)
 		keys, e = redis.Strings(cursor_keys[1], nil)
-		keys = PreTreatmentKeys(keys)
-		CheckError(e)
+		keys = base.FilterStringArray(keys, PREFIX_STATUS)
+		base.CheckError(e)
 		socket.PipelineGetValue(keys)
 		if cursor == "0" {
 			return

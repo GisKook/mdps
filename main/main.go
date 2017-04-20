@@ -6,6 +6,7 @@ import (
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/db_socket"
 	"github.com/giskook/mdps/redis_socket"
+	"github.com/giskook/mdps/syncer"
 	"github.com/giskook/mdps/zmq_server"
 	"log"
 	"os"
@@ -39,6 +40,10 @@ func main() {
 	go redis_server.DoWork()
 
 	db_socket.NewDbSocket(config.DB)
+
+	// syncer
+	syncer := syncer.NewSyncer()
+	go syncer.Do()
 
 	http_server := zmq_server.NewHttpServer(config.Http)
 	http_server.Init()
