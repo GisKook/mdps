@@ -3,9 +3,11 @@ package redis_socket
 import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/giskook/mdps/base"
+	"github.com/giskook/mdps/conf"
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -50,8 +52,7 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 			conn.Close()
 		}()
 
-		router_monitors := make([]*base.RouterMonitor, len(keys))
-
+		router_monitors := make([]*base.RouterMonitor, 0)
 		var index int = 0
 		var key string = ""
 		for index, key = range keys {
@@ -59,10 +60,10 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 			router_id_port := strings.Split(key, MONITOR_KEY_SEP)
 			router_id, _ := strconv.Atoi(router_id_port[1])
 			serial_port, _ := strconv.Atoi(router_id_port[2])
-			router_monitors[index] = &base.RouterMonitor{
+			router_monitors = append(router_monitors, &base.RouterMonitor{
 				RouterID:   uint32(router_id),
 				SerialPort: uint8(serial_port),
-			}
+			})
 
 		}
 
@@ -77,7 +78,12 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 			}
 
 			v, _ := redis.ByteSlices(v_redis, nil)
-			socket.PipelineSetMonitorValue(v, router_monitors[i])
+			m, e := socket.PipelineSetMonitorValue(v)
+			if e != nil {
+				base.CheckError(e)
+			} else {
+				router_monitors = append(router_monitors, m)
+			}
 
 		}
 		conn.Do("")
@@ -90,7 +96,8 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 
 }
 
-func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte, router_monitor *base.RouterMonitor) {
+func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte) (*base.RouterMonitor, error) {
+	var router_monitor base.RouterMonitor
 	item_count := len(raw)
 	var index int = 0
 	for i := 0; i < item_count/2; i++ {
@@ -113,4 +120,11 @@ func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte, router_monitor 
 		}
 		index += 2
 	}
+
+	if router_monitor.TimeStamp < time.Now().Unix()-int64(conf.GetConf().Redis.ExpiredThreshold) {
+		return nil, base.Error_Redis_Monitor_Expired
+	}
+
+	return &router_monitor, nil
+
 }
