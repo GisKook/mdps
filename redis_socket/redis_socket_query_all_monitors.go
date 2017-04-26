@@ -53,6 +53,7 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 		}()
 
 		router_monitors := make([]*base.RouterMonitor, 0)
+		router_monitors_routerid_serial := make([]*base.RouterMonitor, 0)
 		var index int = 0
 		var key string = ""
 		for index, key = range keys {
@@ -60,7 +61,7 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 			router_id_port := strings.Split(key, MONITOR_KEY_SEP)
 			router_id, _ := strconv.Atoi(router_id_port[1])
 			serial_port, _ := strconv.Atoi(router_id_port[2])
-			router_monitors = append(router_monitors, &base.RouterMonitor{
+			router_monitors_routerid_serial = append(router_monitors_routerid_serial, &base.RouterMonitor{
 				RouterID:   uint32(router_id),
 				SerialPort: uint8(serial_port),
 			})
@@ -78,11 +79,12 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 			}
 
 			v, _ := redis.ByteSlices(v_redis, nil)
-			m, e := socket.PipelineSetMonitorValue(v)
+			m, e := socket.PipelineSetMonitorValue(v, i, router_monitors_routerid_serial)
 			if e != nil {
 				base.CheckError(e)
 			} else {
 				router_monitors = append(router_monitors, m)
+				log.Println(m)
 			}
 
 		}
@@ -96,8 +98,13 @@ func (socket *RedisSocket) PipelineGetMonitorsValue(keys []string) []*base.Route
 
 }
 
-func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte) (*base.RouterMonitor, error) {
-	var router_monitor base.RouterMonitor
+func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte, _index int, router_id_serial []*base.RouterMonitor) (*base.RouterMonitor, error) {
+
+	router_monitor := &base.RouterMonitor{
+		RouterID:   router_id_serial[_index].RouterID,
+		SerialPort: router_id_serial[_index].SerialPort,
+	}
+
 	item_count := len(raw)
 	var index int = 0
 	for i := 0; i < item_count/2; i++ {
@@ -125,6 +132,7 @@ func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte) (*base.RouterMo
 		return nil, base.Error_Redis_Monitor_Expired
 	}
 
-	return &router_monitor, nil
+	log.Println(*router_monitor)
+	return router_monitor, nil
 
 }
