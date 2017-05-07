@@ -41,6 +41,7 @@ type ZmqServer struct {
 	Socket_Terminal_Control_Down_Socket *zmq.Socket
 	Socket_Terminal_Control_Up_Chan     chan string
 	Socket_Terminal_Control_Down_Chan   chan string
+	Mutex_Socket_Terminal_Control_Down  sync.Mutex
 
 	Socket_Terminal_Data_Up_Socket *zmq.Socket
 	Socket_Terminal_Data_Up_Chan   chan string
@@ -119,6 +120,9 @@ func (s *ZmqServer) CollectSend(value *ZmqSendValue) {
 }
 
 func (s *ZmqServer) SendControlDown(command *Report.ControlCommand) {
+	defer s.Mutex_Socket_Terminal_Control_Down.Unlock()
+	s.Mutex_Socket_Terminal_Control_Down.Lock()
+
 	uuid := command.Uuid
 	s.Socket_Terminal_Control_Down_Socket.Send(uuid, zmq.SNDMORE)
 
