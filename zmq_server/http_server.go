@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"sync/atomic"
 )
 
 type Http_server struct {
@@ -59,4 +60,8 @@ func GetHttpServer() *Http_server {
 	G_MutexHttpServer.Lock()
 
 	return G_HttpServer
+}
+
+func (h *Http_server) IncreaseSerial() uint16 {
+	return uint16(atomic.AddUint32(&h.SerialID, 1))
 }
