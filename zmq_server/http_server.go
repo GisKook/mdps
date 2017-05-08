@@ -10,9 +10,14 @@ import (
 )
 
 type Http_server struct {
-	Addr         string
-	HttpRespones map[uint64]chan *Report.ControlCommand
-	SerialID     uint32
+	Addr             string
+	HttpRespones     map[uint64]chan *Report.ControlCommand
+	HttpRequestAdd   chan *HttpRequestPair
+	HttpRequestDel   chan uint64
+	HttpResponseChan chan *HttpRequestPair
+
+	SerialID    uint32
+	SerialIDMap map[uint16]uint16
 }
 
 var G_MutexHttpServer sync.Mutex
@@ -22,9 +27,13 @@ func NewHttpServer(config *conf.HttpConf) *Http_server {
 	defer G_MutexHttpServer.Unlock()
 	G_MutexHttpServer.Lock()
 	G_HttpServer = &Http_server{
-		Addr:         config.Addr,
-		HttpRespones: make(map[uint64]chan *Report.ControlCommand),
-		SerialID:     0,
+		Addr:             config.Addr,
+		HttpRespones:     make(map[uint64]chan *Report.ControlCommand),
+		HttpRequestAdd:   make(chan chan *Report.ControlCommand),
+		HttpRequestDel:   make(chan uint64),
+		HttpResponseChan: make(chan *HttpResponsePair),
+		SerialID:         0,
+		SerialIDMap:      make(map[uint16]uint16),
 	}
 
 	return G_HttpServer
@@ -64,4 +73,11 @@ func GetHttpServer() *Http_server {
 
 func (h *Http_server) IncreaseSerial() uint16 {
 	return uint16(atomic.AddUint32(&h.SerialID, 1))
+}
+
+func (h *Http_server) SetSerialID(origin_serial uint32) uint16 {
+	inner_serial := h.IncreaseSerial()
+	h.SerialIDMap[inner_serial] = origin_serial
+
+	return inner_serial
 }
