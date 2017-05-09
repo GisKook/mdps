@@ -6,7 +6,6 @@ import (
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -85,26 +84,18 @@ func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	chan_key := GenerateKey(*rs485_set_cnfig.Plc_id, *rs485_set_cnfig.Serial)
 
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-
-	if !ok {
-		chan_response = make(chan *Report.ControlCommand)
-		var once sync.Once
-		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
-	}
-
+	chan_response := GetHttpServer().SendRequest(chan_key)
 	GetZmqServer().SendControlDown(req)
 
 	select {
 	case res := <-chan_response:
 		result := (*Report.ControlCommand)(res).Paras[0].Npara
 		fmt.Fprint(w, EncodingGeneralResponse(uint8(result)))
+		GetHttpServer().DelRequest(chan_key)
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
-		close(chan_response)
-		delete(GetHttpServer().HttpRespones, chan_key)
-
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+		GetHttpServer().DelRequest(chan_key)
 	}
 }

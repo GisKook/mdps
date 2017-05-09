@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
-	"sync"
 	"time"
 )
 
@@ -101,14 +100,7 @@ func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	chan_key := GenerateKey(*rs232_set_cnfig.Plc_id, *rs232_set_cnfig.Serial)
 
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-
-	if !ok {
-		chan_response = make(chan *Report.ControlCommand)
-		var once sync.Once
-		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
-	}
-
+	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)
 cmd:
 	GetZmqServer().SendControlDown(req)
@@ -117,6 +109,7 @@ cmd:
 	case res := <-chan_response:
 		result := (*Report.ControlCommand)(res).Paras[1].Npara
 		fmt.Fprint(w, EncodingGeneralResponse(uint8(result)))
+		GetHttpServer().DelRequest(chan_key)
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
@@ -124,11 +117,8 @@ cmd:
 			try_time++
 			goto cmd
 		} else {
-			close(chan_response)
-			var once sync.Once
-			once.Do(func() { delete(GetHttpServer().HttpRespones, chan_key) })
-
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+			GetHttpServer().DelRequest(chan_key)
 		}
 	}
 }

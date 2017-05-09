@@ -27,8 +27,9 @@ func (h *Http_server) Run() {
 		select {
 		case add := <-h.HttpRequestAdd:
 			h.HttpRespones[add.Key] = add.Command
-		case del := <-h.HttpRequestDel:
-			delete(h.HttpRespones, del.Key)
+		case key := <-h.HttpRequestDel:
+			close(h.HttpRespones[key])
+			delete(h.HttpRespones, key)
 		case res := <-h.HttpResponseChan:
 			chan_resp, ok := h.HttpRespones[res.Key]
 			if ok {
@@ -41,4 +42,14 @@ func (h *Http_server) Run() {
 
 func (h *Http_server) DoResponse(resp *HttpResponsePair) {
 	h.HttpResponseChan <- resp
+}
+
+func (h *Http_server) SendRequest(key uint64) chan *Report.ControlCommand {
+	chan_response := make(chan *Report.ControlCommand)
+	h.AddRequest(&HttpRequestPair{
+		Key:     key,
+		Command: chan_response,
+	})
+
+	return chan_response
 }

@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
-	"runtime/debug"
-	"sync"
 	"time"
 )
 
@@ -58,7 +55,6 @@ func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 }
 
 func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Rs232GetConfig")
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var rs232_get_config Rs232GetConfig
@@ -78,7 +74,6 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		if x := recover(); x != nil {
-			log.Printf("%s %s\n", x, debug.Stack())
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
@@ -98,13 +93,7 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 
 	chan_key := GenerateKey(*rs232_get_config.Plc_id, *rs232_get_config.Serial)
 
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-
-	if !ok {
-		chan_response = make(chan *Report.ControlCommand)
-		var once sync.Once
-		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
-	}
+	chan_response := GetHttpServer().SendRequest(chan_key)
 
 	try_time := uint8(0)
 cmd:
@@ -113,20 +102,16 @@ cmd:
 	select {
 	case res := <-chan_response:
 		fmt.Fprint(w, EncodeRs232GetConfigResponse(res))
+		GetHttpServer().DelRequest(chan_key)
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
-		log.Println("time out")
 		if try_time < conf.GetConf().Http.TryTime {
-			log.Printf("try %d\n", try_time)
 			try_time++
 			goto cmd
 		} else {
-			close(chan_response)
-			var once sync.Once
-			once.Do(func() { delete(GetHttpServer().HttpRespones, chan_key) })
-
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+			GetHttpServer().DelRequest(chan_key)
 		}
 	}
 }

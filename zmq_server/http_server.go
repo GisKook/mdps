@@ -14,10 +14,10 @@ type Http_server struct {
 	HttpRespones     map[uint64]chan *Report.ControlCommand
 	HttpRequestAdd   chan *HttpRequestPair
 	HttpRequestDel   chan uint64
-	HttpResponseChan chan *HttpRequestPair
+	HttpResponseChan chan *HttpResponsePair
 
 	SerialID    uint32
-	SerialIDMap map[uint16]uint16
+	SerialIDMap map[uint16]uint32
 }
 
 var G_MutexHttpServer sync.Mutex
@@ -29,11 +29,11 @@ func NewHttpServer(config *conf.HttpConf) *Http_server {
 	G_HttpServer = &Http_server{
 		Addr:             config.Addr,
 		HttpRespones:     make(map[uint64]chan *Report.ControlCommand),
-		HttpRequestAdd:   make(chan chan *Report.ControlCommand),
+		HttpRequestAdd:   make(chan *HttpRequestPair),
 		HttpRequestDel:   make(chan uint64),
 		HttpResponseChan: make(chan *HttpResponsePair),
 		SerialID:         0,
-		SerialIDMap:      make(map[uint16]uint16),
+		SerialIDMap:      make(map[uint16]uint32),
 	}
 
 	return G_HttpServer

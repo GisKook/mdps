@@ -7,7 +7,6 @@ import (
 	"github.com/giskook/mdps/pb"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -88,14 +87,7 @@ func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 
 	chan_key := GenerateKey(*get_server_addr.Plc_id, *get_server_addr.Serial)
 
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-
-	if !ok {
-		chan_response = make(chan *Report.ControlCommand)
-		var once sync.Once
-		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
-	}
-
+	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)
 cmd:
 	GetZmqServer().SendControlDown(req)
@@ -103,6 +95,7 @@ cmd:
 	select {
 	case res := <-chan_response:
 		fmt.Fprint(w, EncodeGetServerAddrResponse(res))
+		GetHttpServer().DelRequest(chan_key)
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
@@ -110,11 +103,9 @@ cmd:
 			try_time++
 			goto cmd
 		} else {
-			close(chan_response)
-			var once sync.Once
-			once.Do(func() { delete(GetHttpServer().HttpRespones, chan_key) })
 
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+			GetHttpServer().DelRequest(chan_key)
 		}
 	}
 }

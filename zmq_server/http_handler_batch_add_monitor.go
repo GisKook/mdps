@@ -7,7 +7,6 @@ import (
 	"github.com/giskook/mdps/pb"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -113,14 +112,7 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 
 	chan_key := GenerateKey(*batch_add_monitor.Plc_id, *batch_add_monitor.Serial)
 
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-
-	if !ok {
-		chan_response = make(chan *Report.ControlCommand)
-		var once sync.Once
-		once.Do(func() { GetHttpServer().HttpRespones[chan_key] = chan_response })
-	}
-
+	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)
 cmd:
 	GetZmqServer().SendControlDown(req)
@@ -131,6 +123,7 @@ cmd:
 		result := uint8((*Report.ControlCommand)(res).Paras[1].Npara)
 
 		fmt.Fprint(w, EncodingGeneralResponse(result))
+		GetHttpServer().DelRequest(chan_key)
 
 		break
 	case <-time.After(time.Duration(conf.GetConf().Http.Timeout) * time.Second):
@@ -138,10 +131,8 @@ cmd:
 			try_time++
 			goto cmd
 		} else {
-			close(chan_response)
-			var once sync.Once
-			once.Do(func() { delete(GetHttpServer().HttpRespones, chan_key) })
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_TIMEOUT))
+			GetHttpServer().DelRequest(chan_key)
 		}
 	}
 }
