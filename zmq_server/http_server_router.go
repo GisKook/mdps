@@ -2,6 +2,7 @@ package zmq_server
 
 import (
 	"github.com/giskook/mdps/pb"
+	"log"
 )
 
 type HttpRequestPair struct {
@@ -33,7 +34,10 @@ func (h *Http_server) Run() {
 		case res := <-h.HttpResponseChan:
 			chan_resp, ok := h.HttpRespones[res.Key]
 			if ok {
+				res.Command.SerialNumber = h.GetSerialID(uint16(res.Command.SerialNumber))
 				chan_resp <- res.Command
+			} else {
+				log.Println("nokey")
 			}
 
 		}

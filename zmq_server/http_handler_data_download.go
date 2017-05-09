@@ -51,10 +51,11 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	data, _ := base64.StdEncoding.DecodeString(*data_download.Data)
+	_serial := uint32(GetHttpServer().SetSerialID(*data_download.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *data_download.Plc_id,
-		SerialNumber: *data_download.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_DATA_DOWNLOAD,
 		Paras: []*Report.Param{
 			&Report.Param{
@@ -80,7 +81,7 @@ func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	chan_key := GenerateKey(*data_download.Plc_id, *data_download.Serial)
+	chan_key := GenerateKey(*data_download.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)

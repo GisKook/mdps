@@ -10,10 +10,10 @@ func (s *ZmqServer) ProccessControlRepBatchAddAlter(command *Report.ControlComma
 	serial := command.SerialNumber
 
 	chan_key := _GenerateKey(tid, serial)
-	chan_response, ok := GetHttpServer().HttpRespones[chan_key]
-	if ok {
-		chan_response <- command
-	}
+	GetHttpServer().DoResponse(&HttpResponsePair{
+		Key:     chan_key,
+		Command: command,
+	})
 	redis_socket.GetRedisSocket().UpdateStatus(tid)
 
 }

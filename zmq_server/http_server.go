@@ -16,7 +16,9 @@ type Http_server struct {
 	HttpRequestDel   chan uint64
 	HttpResponseChan chan *HttpResponsePair
 
-	SerialID    uint32
+	SerialID uint32
+
+	MutexSerial sync.Mutex
 	SerialIDMap map[uint16]uint32
 }
 
@@ -58,6 +60,7 @@ func (server *Http_server) Init() {
 }
 
 func (server *Http_server) Start() {
+	go server.Run()
 	err := http.ListenAndServe(server.Addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe :", err)
@@ -76,8 +79,23 @@ func (h *Http_server) IncreaseSerial() uint16 {
 }
 
 func (h *Http_server) SetSerialID(origin_serial uint32) uint16 {
+	defer h.MutexSerial.Unlock()
+	h.MutexSerial.Lock()
+
 	inner_serial := h.IncreaseSerial()
 	h.SerialIDMap[inner_serial] = origin_serial
 
 	return inner_serial
+}
+
+func (h *Http_server) GetSerialID(gen_serial uint16) uint32 {
+	defer h.MutexSerial.Unlock()
+	h.MutexSerial.Lock()
+
+	v, ok := h.SerialIDMap[gen_serial]
+	if ok {
+		return v
+	} else {
+		return 0
+	}
 }

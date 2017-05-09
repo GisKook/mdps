@@ -26,10 +26,11 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 	plc_id, serial := GetPLCIDAndSerial(r)
 	delay := GetUint8Value(r, HTTP_RESTART_DELAY)
 
+	_serial := uint32(GetHttpServer().SetSerialID(serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          plc_id,
-		SerialNumber: serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_RESTART,
 		Paras: []*Report.Param{
 			&Report.Param{
@@ -41,8 +42,7 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 
 	//data, _ := proto.Marshal(req)
 
-	chan_key := GenerateKey(plc_id, serial)
-
+	chan_key := GenerateKey(plc_id, _serial)
 	chan_response := GetHttpServer().SendRequest(chan_key)
 
 	try_time := uint8(0)

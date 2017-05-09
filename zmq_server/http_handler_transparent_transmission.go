@@ -94,15 +94,16 @@ func TransparentTransmissionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(paras)
+	_serial := uint32(GetHttpServer().SetSerialID(*transparent_transmission.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *transparent_transmission.Plc_id,
-		SerialNumber: *transparent_transmission.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_TRANSPARENT_TRANSMISSION,
 		Paras:        paras,
 	}
 
-	chan_key := GenerateKey(*transparent_transmission.Plc_id, *transparent_transmission.Serial)
+	chan_key := GenerateKey(*transparent_transmission.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)

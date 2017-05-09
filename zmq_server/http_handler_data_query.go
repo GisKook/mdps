@@ -73,10 +73,11 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	_serial := uint32(GetHttpServer().SetSerialID(*data_query.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *data_query.Plc_id,
-		SerialNumber: *data_query.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_DATA_QUERY,
 		Paras: []*Report.Param{
 			&Report.Param{
@@ -98,7 +99,7 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	chan_key := GenerateKey(*data_query.Plc_id, *data_query.Serial)
+	chan_key := GenerateKey(*data_query.Plc_id, _serial)
 	chan_response := GetHttpServer().SendRequest(chan_key)
 
 	try_time := uint8(0)

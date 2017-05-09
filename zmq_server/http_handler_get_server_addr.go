@@ -72,10 +72,11 @@ func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	_serial := uint32(GetHttpServer().SetSerialID(*get_server_addr.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *get_server_addr.Plc_id,
-		SerialNumber: *get_server_addr.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_GET_SERVER_ADDR,
 		Paras: []*Report.Param{
 			&Report.Param{
@@ -85,7 +86,7 @@ func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	chan_key := GenerateKey(*get_server_addr.Plc_id, *get_server_addr.Serial)
+	chan_key := GenerateKey(*get_server_addr.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)

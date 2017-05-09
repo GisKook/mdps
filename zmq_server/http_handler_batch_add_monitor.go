@@ -102,15 +102,16 @@ func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	_serial := uint32(GetHttpServer().SetSerialID(*batch_add_monitor.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *batch_add_monitor.Plc_id,
-		SerialNumber: *batch_add_monitor.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_BATCH_ADD_MONITOR,
 		Paras:        paras,
 	}
 
-	chan_key := GenerateKey(*batch_add_monitor.Plc_id, *batch_add_monitor.Serial)
+	chan_key := GenerateKey(*batch_add_monitor.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)

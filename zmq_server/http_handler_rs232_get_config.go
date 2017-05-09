@@ -78,10 +78,11 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	_serial := uint32(GetHttpServer().SetSerialID(*rs232_get_config.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *rs232_get_config.Plc_id,
-		SerialNumber: *rs232_get_config.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_RS232_GET_CONFIG,
 		Paras: []*Report.Param{
 			&Report.Param{
@@ -91,7 +92,7 @@ func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	chan_key := GenerateKey(*rs232_get_config.Plc_id, *rs232_get_config.Serial)
+	chan_key := GenerateKey(*rs232_get_config.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 

@@ -125,15 +125,16 @@ func BatchAddAlterHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	_serial := uint32(GetHttpServer().SetSerialID(*batch_add_alter.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",
 		Tid:          *batch_add_alter.Plc_id,
-		SerialNumber: *batch_add_alter.Serial,
+		SerialNumber: _serial,
 		Type:         Report.ControlCommand_CMT_REQ_BATCH_ADD_ALTER,
 		Paras:        paras,
 	}
 
-	chan_key := GenerateKey(*batch_add_alter.Plc_id, *batch_add_alter.Serial)
+	chan_key := GenerateKey(*batch_add_alter.Plc_id, _serial)
 
 	chan_response := GetHttpServer().SendRequest(chan_key)
 	try_time := uint8(0)
