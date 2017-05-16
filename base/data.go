@@ -38,3 +38,27 @@ type RouterMonitorDB struct {
 	Datatype   uint8
 	ModbusAddr uint32
 }
+
+type Alter struct {
+	ModbusAddr uint32
+	DataType   uint8
+	DateLen    uint8
+	Data       []byte
+	Status     uint8
+}
+
+type RouterAlterRedis struct {
+	RouterID   uint64
+	SerialPort uint8
+	Alters     []Alter
+}
+
+type RouterAlterDB struct {
+	RouterID   uint64
+	SerialPort uint8
+	ModbusAddr uint32
+	DataType   uint8
+	DateLen    uint8
+	Data       []byte
+	Status     uint8
+}

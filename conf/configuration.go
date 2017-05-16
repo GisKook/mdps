@@ -29,6 +29,7 @@ type RedisConf struct {
 	AltersKeyExpire   uint32
 	StatusExpire      uint32
 	SyncInterval      uint32
+	SyncAlterInterval uint32
 	ExpiredThreshold  uint32
 }
 

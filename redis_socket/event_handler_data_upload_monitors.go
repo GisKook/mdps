@@ -1,11 +1,6 @@
 package redis_socket
 
 import (
-	//	"bytes"
-	//	"encoding/binary"
-	//	"github.com/giskook/mdps/conf"
-	//"github.com/giskook/mdps/base"
-	//"log"
 	"strconv"
 	"time"
 )
@@ -24,7 +19,6 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 		conn := socket.GetConn()
 		defer conn.Close()
 
-		//log.Println(len(socket.DataUploadMonitors))
 		for _, data_command := range socket.DataUploadMonitors {
 			monitor_key :=
 				PREFIX_MONITORS +
@@ -35,14 +29,8 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 			conn.Send("EXPIRE", monitor_key)
 			conn.Send("HMSET", TIMESTAMP, time.Now().Unix())
 
-			//log.Println(len(data_command.Monitors))
 			for _, monitor := range data_command.Monitors {
-				//log.Println(monitor)
-				//reader := bytes.NewReader(monitor.Data)
 				if monitor.DataType == 0 {
-					//	var byte_value byte
-					//			for i := 0; i < int(monitor.DataLen); i++ {
-					//	binary.Read(reader, binary.LittleEndian, &byte_value)
 					conn.Send("HMSET",
 						monitor_key,
 						strconv.Itoa(int(monitor.ModusAddr))+
@@ -51,12 +39,7 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 							SEP_MONITORS+
 							strconv.Itoa(int(monitor.DataLen)),
 						monitor.Data)
-					//base.GetString(monitor.Data))
-					//		}
 				} else if monitor.DataType == 1 {
-					//		var word_value uint16
-					//	for i := 0; i < int(monitor.DataLen); i++ {
-					//			binary.Read(reader, binary.LittleEndian, &word_value)
 					conn.Send("HMSET",
 						monitor_key,
 						strconv.Itoa(int(monitor.ModusAddr))+
@@ -65,8 +48,6 @@ func (socket *RedisSocket) ProccessDataUploadMonitors() {
 							SEP_MONITORS+
 							strconv.Itoa(int(monitor.DataLen)),
 						monitor.Data)
-					//base.GetString(monitor.Data))
-					//}
 				}
 			}
 			data_command = nil
