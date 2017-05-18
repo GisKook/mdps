@@ -1,6 +1,7 @@
 package redis_socket
 
 import (
+	"github.com/giskook/mdps/syncer_alter"
 	"strconv"
 )
 
@@ -12,6 +13,11 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 		defer conn.Close()
 
 		router_alters := socket.ProccessDataUploadAltersFetch(socket.DataUploadAlters)
+		alters := socket.FilterAlters(socket.DataUploadAlters, router_alters)
+
+		for _, v := range alters {
+			syncer_alter.GetSyncerAlter().ChanRouterAlters <- v
+		}
 
 		for _, data_command := range socket.DataUploadAlters {
 			alter_key := socket.GenAlterKey(data_command)

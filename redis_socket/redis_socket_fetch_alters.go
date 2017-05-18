@@ -13,26 +13,25 @@ func (socket *RedisSocket) ProccessDataUploadAltersFetch(alters []*Report.DataCo
 	defer conn.Close()
 	router_alters := make([]*base.RouterAlterRedis, 0)
 
-	for index, data_command := range alters {
+	for _, data_command := range alters {
 		alter_key := socket.GenAlterKey(data_command)
 		router_alters = append(router_alters, &base.RouterAlterRedis{
 			RouterID:   data_command.Tid,
-			SerialPort: data_command.SerialPort,
+			SerialPort: uint8(data_command.SerialPort),
 		})
 		conn.Send("HGETALL", alter_key)
 	}
 
-	router_count := index + 1
 	conn.Flush()
 
-	for i := 0; i < router_count; i++ {
+	for i := 0; i < len(alters); i++ {
 		v_redis, err := conn.Receive()
 		if err != nil {
 			base.CheckError(err)
 			continue
 		}
 		v, _ := redis.ByteSlices(v_redis, nil)
-		socket.PipelineGetAlterValue(v_redis, i, router_alters)
+		socket.PipelineGetAlterValue(v, i, router_alters)
 	}
 
 	return router_alters
@@ -48,8 +47,8 @@ func (socket *RedisSocket) PipelineGetAlterValue(raw [][]byte, index int, router
 		datatype, _ := strconv.Atoi(modbus_datatype_datalen[1])
 		datalen, _ := strconv.Atoi(modbus_datatype_datalen[2])
 		value := raw[i+1]
-		status := uint8(raw[0])
-		data := raw[1:]
+		status := uint8(value[0])
+		data := value[1:]
 		router_alters[index].Alters = append(router_alters[index].Alters, &base.Alter{
 			ModbusAddr: uint32(modbus_addr),
 			DataType:   uint8(datatype),

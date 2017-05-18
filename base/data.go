@@ -42,7 +42,7 @@ type RouterMonitorDB struct {
 type Alter struct {
 	ModbusAddr uint32
 	DataType   uint8
-	DateLen    uint8
+	DataLen    uint8
 	Data       []byte
 	Status     uint8
 }
@@ -50,15 +50,18 @@ type Alter struct {
 type RouterAlterRedis struct {
 	RouterID   uint64
 	SerialPort uint8
-	Alters     []Alter
+	Alters     []*Alter
 }
 
-type RouterAlterDB struct {
+type RouterAlter struct {
 	RouterID   uint64
 	SerialPort uint8
 	ModbusAddr uint32
 	DataType   uint8
-	DateLen    uint8
+	DataLen    uint8
 	Data       []byte
 	Status     uint8
+
+	DataTypeDB uint8
+	AlterIDDB  uint32
 }
