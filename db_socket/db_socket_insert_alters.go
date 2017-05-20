@@ -12,16 +12,30 @@ import (
 
 const (
 	TRANS_TABLE_ALTER_NAME_FMT string = "DMS_DAP_ALTER_200601"
-	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALTER_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS) VALUES(%d, %d, %d, %d, %d)"
+	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALTER_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS) VALUES(%d, %d, %d, %d, %d)"
+	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALTER_ID, DATATYPE, DATA, ADDRESS) VALUES(%d, %d, %s, %d)"
 )
 
 func (socket *DbSocket) InsertAlters(router_alter []*base.RouterAlter) {
 	tx, err := socket.Db.Begin()
 	base.CheckError(err)
 	for _, v := range router_alter {
+		insert_sql := FmtInsertAlterSQL(v)
+		log.Println(insert_sql)
+		_, err = tx.Exec(insert_sql)
+		base.CheckError(err)
+
+	}
+	err = tx.Commit()
+	base.CheckError(err)
+}
+func (socket *DbSocket) InsertAltersEx(router_alter []*base.RouterAlter) {
+	tx, err := socket.Db.Begin()
+	base.CheckError(err)
+	for _, v := range router_alter {
 		value, e := socket.ParseAlterValue(v)
 		if e == nil {
-			insert_sql := FmtInsertAlterSQL(v, value)
+			insert_sql := FmtInsertAlterSQLEx(v, value)
 			log.Println(insert_sql)
 			_, err = tx.Exec(insert_sql)
 			base.CheckError(err)
@@ -132,20 +146,28 @@ func GetAlterTableName(t int64) string {
 //	return _t.Format("2006-01-02 15:04:05")
 //}
 
-func FmtInsertAlterSQL(router *base.RouterAlter, value *base.Variant) string {
+func FmtInsertAlterSQLEx(router *base.RouterAlter, value *base.Variant) string {
 	time_stamp := time.Now().Unix()
 	var insert_sql string
 	if value.Type == base.DATATYPE_DB_FLOAT {
-		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int32(value.Float), int32(value.Float*100)%100, router.ModbusAddr)
+		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE_EX, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int32(value.Float), int32(value.Float*100)%100, router.ModbusAddr)
 	} else if value.Type == base.DATATYPE_DB_SWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int16(value.ValueInt), 0, router.ModbusAddr)
+		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE_EX, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int16(value.ValueInt), 0, router.ModbusAddr)
 	} else if value.Type == base.DATATYPE_DB_UWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, uint16(value.ValueInt), 0, router.ModbusAddr)
+		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE_EX, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, uint16(value.ValueInt), 0, router.ModbusAddr)
 	} else if value.Type == base.DATATYPE_DB_SDWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int32(value.ValueInt), 0, router.ModbusAddr)
+		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE_EX, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, int32(value.ValueInt), 0, router.ModbusAddr)
 	} else if value.Type == base.DATATYPE_DB_UDWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, uint32(value.ValueInt), 0, router.ModbusAddr)
+		insert_sql = fmt.Sprintf(SQL_INSERT_ALTER_TABLE_EX, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, uint32(value.ValueInt), 0, router.ModbusAddr)
 	}
+
+	return insert_sql
+}
+
+func FmtInsertAlterSQL(router *base.RouterAlter) string {
+	time_stamp := time.Now().Unix()
+
+	insert_sql := fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, base.GetString(router.Data), router.ModbusAddr)
 
 	return insert_sql
 }

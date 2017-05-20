@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	TRANS_TABLE_NAME_FMT     string = "DMS_DMP_MONITOR_200601"
-	SQL_INSERT_MONITOR_TABLE string = "INSERT %s (MONITOR_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, TIMESTAMP) VALUES(%d, %d, %d, %d, %d, '%s')"
+	TRANS_TABLE_NAME_FMT        string = "DMS_DMP_MONITOR_200601"
+	SQL_INSERT_MONITOR_TABLE_EX string = "INSERT %s (MONITOR_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, TIMESTAMP) VALUES(%d, %d, %d, %d, %d, '%s')"
+	SQL_INSERT_MONITOR_TABLE    string = "INSERT %s (MONITOR_ID, DATATYPE, DATA, ADDRESS, TIMESTAMP) VALUES(%d, %d, %s, %d, '%s')"
 )
 
-func (socket *DbSocket) InsertMonitors(router_db []*base.RouterMonitorDB, router_redis []*base.RouterMonitor) {
+func (socket *DbSocket) InsertMonitorsEx(router_db []*base.RouterMonitorDB, router_redis []*base.RouterMonitor) {
 	tx, err := socket.Db.Begin()
 	base.CheckError(err)
 	for _, v := range router_db {
@@ -23,12 +24,29 @@ func (socket *DbSocket) InsertMonitors(router_db []*base.RouterMonitorDB, router
 		if router_monitor_single != nil {
 			value, e := socket.ParseValue(v.Datatype, router_monitor_single.DataType, router_monitor_single.DataLen, router_monitor_single.Data)
 			if e == nil {
-				insert_sql := FmtSQL(v, router_monitor_single, time_stamp, value)
+				insert_sql := FmtSQLEx(v, router_monitor_single, time_stamp, value)
 				log.Println(insert_sql)
 				_, err = tx.Exec(insert_sql)
 				base.CheckError(err)
 
 			}
+		}
+	}
+	err = tx.Commit()
+	base.CheckError(err)
+}
+
+func (socket *DbSocket) InsertMonitors(router_db []*base.RouterMonitorDB, router_redis []*base.RouterMonitor) {
+	tx, err := socket.Db.Begin()
+	base.CheckError(err)
+	for _, v := range router_db {
+		router_monitor_single, time_stamp := socket.GetValues(router_redis, v)
+		if router_monitor_single != nil {
+			insert_sql := FmtSQL(v, router_monitor_single, time_stamp)
+			log.Println(insert_sql)
+			_, err = tx.Exec(insert_sql)
+			base.CheckError(err)
+
 		}
 	}
 	err = tx.Commit()
@@ -149,19 +167,25 @@ func GetTime(t int64) string {
 	return _t.Format("2006-01-02 15:04:05")
 }
 
-func FmtSQL(monitor_db *base.RouterMonitorDB, monitor_redis *base.RouterMonitorSingle, time_stamp int64, value *base.Variant) string {
+func FmtSQLEx(monitor_db *base.RouterMonitorDB, monitor_redis *base.RouterMonitorSingle, time_stamp int64, value *base.Variant) string {
 	var insert_sql string
 	if value.Type == base.DATATYPE_DB_FLOAT {
-		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int32(value.Float), int32(value.Float)*100%100, monitor_db.ModbusAddr, GetTime(time_stamp))
+		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE_EX, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int32(value.Float), int32(value.Float)*100%100, monitor_db.ModbusAddr, GetTime(time_stamp))
 	} else if value.Type == base.DATATYPE_DB_SWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int16(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
+		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE_EX, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int16(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
 	} else if value.Type == base.DATATYPE_DB_UWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, uint16(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
+		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE_EX, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, uint16(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
 	} else if value.Type == base.DATATYPE_DB_SDWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int32(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
+		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE_EX, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, int32(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
 	} else if value.Type == base.DATATYPE_DB_UDWORD {
-		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, uint32(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
+		insert_sql = fmt.Sprintf(SQL_INSERT_MONITOR_TABLE_EX, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, uint32(value.ValueInt), 0, monitor_db.ModbusAddr, GetTime(time_stamp))
 	}
+
+	return insert_sql
+}
+
+func FmtSQL(monitor_db *base.RouterMonitorDB, monitor_redis *base.RouterMonitorSingle, time_stamp int64) string {
+	insert_sql := fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, base.GetString(monitor_redis.Data), monitor_db.ModbusAddr, GetTime(time_stamp))
 
 	return insert_sql
 }
