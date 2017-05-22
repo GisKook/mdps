@@ -22,7 +22,8 @@
         "AltersKeyExpire":20,
         "StatusExpire":150, 
 	"SyncInterval":5,
-	"ExpiredThreshold":600
+	"ExpiredThreshold":600,
+        "SyncAlterInterval":10
 
     },
 
