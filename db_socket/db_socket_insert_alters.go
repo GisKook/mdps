@@ -12,7 +12,7 @@ import (
 
 const (
 	TRANS_TABLE_ALTER_NAME_FMT string = "DMS_DAP_ALTER_200601"
-	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALTER_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS) VALUES(%d, %d, %d, %d, %d)"
+	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALTER_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, STATUS) VALUES(%d, %d, %d, %d, %d, %d)"
 	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALTER_ID, DATATYPE, DATA, ADDRESS) VALUES(%d, %d, %s, %d)"
 )
 
@@ -167,7 +167,7 @@ func FmtInsertAlterSQLEx(router *base.RouterAlter, value *base.Variant) string {
 func FmtInsertAlterSQL(router *base.RouterAlter) string {
 	time_stamp := time.Now().Unix()
 
-	insert_sql := fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, base.GetString(router.Data), router.ModbusAddr)
+	insert_sql := fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, base.GetString(router.Data), router.ModbusAddr, router.Status)
 
 	return insert_sql
 }
