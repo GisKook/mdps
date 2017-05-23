@@ -14,13 +14,15 @@ func (socket *RedisSocket) FilterAlters(alters []*Report.DataCommand, alters_red
 
 	alter := make([]*base.RouterAlter, 0)
 	for i, v := range alters {
-		CompareAlter(v, alters_redis[i].Alters, alter, v.Tid, uint8(v.SerialPort))
+		alter = append(alter, CompareAlter(v, alters_redis[i].Alters, v.Tid, uint8(v.SerialPort))...)
 	}
 
 	return alter
 }
 
-func CompareAlter(data_command *Report.DataCommand, alter_redis []*base.Alter, result []*base.RouterAlter, router_id uint64, serial_port uint8) {
+func CompareAlter(data_command *Report.DataCommand, alter_redis []*base.Alter, router_id uint64, serial_port uint8) []*base.RouterAlter {
+	alter := make([]*base.RouterAlter, 0)
+
 	alter_rep := data_command.Alters
 	for _, a := range alter_rep {
 		for _, b := range alter_redis {
@@ -28,7 +30,7 @@ func CompareAlter(data_command *Report.DataCommand, alter_redis []*base.Alter, r
 				a.DataType == uint32(b.DataType) &&
 				a.DataLen == uint32(b.DataLen) &&
 				a.Status != uint32(b.Status) {
-				result = append(result, &base.RouterAlter{
+				alter = append(alter, &base.RouterAlter{
 					RouterID:   router_id,
 					SerialPort: serial_port,
 					ModbusAddr: b.ModbusAddr,
@@ -39,4 +41,6 @@ func CompareAlter(data_command *Report.DataCommand, alter_redis []*base.Alter, r
 			}
 		}
 	}
+
+	return alter
 }

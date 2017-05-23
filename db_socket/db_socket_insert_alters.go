@@ -12,8 +12,8 @@ import (
 
 const (
 	TRANS_TABLE_ALTER_NAME_FMT string = "DMS_DAP_ALTER_200601"
-	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALTER_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, STATUS) VALUES(%d, %d, %d, %d, %d, %d)"
-	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALTER_ID, DATATYPE, DATA, ADDRESS) VALUES(%d, %d, %s, %d)"
+	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALERT_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, STATUS) VALUES(%d, %d, %d, %d, %d, %d)"
+	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALERT_ID, DATATYPE, DATA, ADDRESS, STATUS) VALUES(%d, %d, %s, %d, %d)"
 )
 
 func (socket *DbSocket) InsertAlters(router_alter []*base.RouterAlter) {

@@ -26,14 +26,17 @@ func (db *DbSocket) GetAlterDataTypeID(alter *base.RouterAlter) (uint32, uint8) 
 		return 0, 0
 	}
 
-	var alter_id uint32
-	var data_type uint8
-
 	rows, er := stmt.Query()
 	base.CheckError(er)
 	defer rows.Close()
-	if e := rows.Scan(&alter_id, &data_type); e != nil {
-		base.CheckError(e)
+
+	var alter_id uint32
+	var data_type uint8
+
+	for rows.Next() {
+		if e := rows.Scan(&alter_id, &data_type); e != nil {
+			base.CheckError(e)
+		}
 	}
 
 	return alter_id, data_type

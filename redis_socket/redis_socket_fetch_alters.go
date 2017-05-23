@@ -4,6 +4,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/giskook/mdps/base"
 	"github.com/giskook/mdps/pb"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -20,6 +21,8 @@ func (socket *RedisSocket) ProccessDataUploadAltersFetch(alters []*Report.DataCo
 			SerialPort: uint8(data_command.SerialPort),
 		})
 		conn.Send("HGETALL", alter_key)
+		log.Println(alter_key)
+
 	}
 
 	conn.Flush()
@@ -40,9 +43,10 @@ func (socket *RedisSocket) ProccessDataUploadAltersFetch(alters []*Report.DataCo
 func (socket *RedisSocket) PipelineGetAlterValue(raw [][]byte, index int, router_alters []*base.RouterAlterRedis) {
 	alter_count := len(raw)
 
-	for i := 0; i < alter_count/2; i += 2 {
+	for i := 0; i < alter_count; i += 2 {
 		key := string(raw[i])
 		modbus_datatype_datalen := strings.Split(key, SEP_ALTERS)
+		log.Println(key)
 		modbus_addr, _ := strconv.Atoi(modbus_datatype_datalen[0])
 		datatype, _ := strconv.Atoi(modbus_datatype_datalen[1])
 		datalen, _ := strconv.Atoi(modbus_datatype_datalen[2])
