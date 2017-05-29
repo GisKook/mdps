@@ -57,6 +57,8 @@ func (server *Http_server) Init() {
 
 	http.HandleFunc(HTTP_TRANSPARENT_TRANSMISSION, TransparentTransmissionHandler)
 	http.HandleFunc(HTTP_RELEASE_TRANSPARENT_TRANSMISSION, ReleaseTransparentTransmissionHandler)
+
+	http.HandleFunc(HTTP_GET_ONLINE_ROUTERS, GetOnlineRoutersHandler)
 }
 
 func (server *Http_server) Start() {

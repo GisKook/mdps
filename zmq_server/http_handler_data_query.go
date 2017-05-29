@@ -49,7 +49,17 @@ func EncodingDataQueryResponse(data_query_response *DataQueryResponse) string {
 }
 
 func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if x := recover(); x != nil {
+			fmt.Fprint(w, EncodingDataQueryResponse(
+				&DataQueryResponse{
+					Result: HTTP_RESPONSE_RESULT_SERVER_FAILED,
+					Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_SERVER_FAILED],
+				}))
+		}
+	}()
 	log.Println("DataQueryHandler")
+
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var data_query DataQuery
@@ -62,16 +72,6 @@ func DataQueryHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_PARAMTER_ERR))
 		return
 	}
-
-	defer func() {
-		if x := recover(); x != nil {
-			fmt.Fprint(w, EncodingDataQueryResponse(
-				&DataQueryResponse{
-					Result: HTTP_RESPONSE_RESULT_SERVER_FAILED,
-					Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_SERVER_FAILED],
-				}))
-		}
-	}()
 
 	_serial := uint32(GetHttpServer().SetSerialID(*data_query.Serial))
 	req := &Report.ControlCommand{

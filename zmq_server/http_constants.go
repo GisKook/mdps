@@ -97,6 +97,9 @@ const (
 	// transparent transmission
 	HTTP_RELEASE_TRANSPARENT_TRANSMISSION string = "/plc/release_transparent_transmission"
 
+	// get all online routers
+	HTTP_GET_ONLINE_ROUTERS string = "/plc/get_online_routers"
+
 	// query rouer status
 	HTTP_QUERY_ROUTER_STATUS string = "/plc/query_router_status"
 

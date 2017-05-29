@@ -34,8 +34,11 @@ func (x Time_Tid_Status) Less(than rbtree.Item) bool {
 }
 
 var G_Status_Checker *Status_Checker
+var G_Mutex_Status_Checker sync.Mutex
 
 func GetStatusChecker() *Status_Checker {
+	defer G_Mutex_Status_Checker.Unlock()
+	G_Mutex_Status_Checker.Lock()
 	if G_Status_Checker == nil {
 		G_Status_Checker = &Status_Checker{
 			Rbt_Tid_Time: rbtree.New(),
@@ -200,4 +203,8 @@ func (sc *Status_Checker) Check() {
 			return
 		}
 	}
+}
+
+func (sc *Status_Checker) GetNodeCount() uint {
+	return sc.Rbt_Tid_Time.Len()
 }
