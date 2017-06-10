@@ -14,30 +14,32 @@ func (s *ZmqServer) Do(cpuid string, uuid string, tid string, worker_connection_
 	plc_id := db_socket.GetDBSocket().GetPlcID(cpuid)
 	log.Println("get plc_id ")
 	log.Println(plc_id)
+	if plc_id != 0 {
 
-	para := []*Report.Param{
-		&Report.Param{
-			Type:  Report.Param_UINT8,
-			Npara: 0,
-		},
-		&Report.Param{
-			Type:  Report.Param_UINT64,
-			Npara: plc_id,
-		},
-	}
-	command_rep := &Report.ManageCommand{
-		Type:  Report.ManageCommand_CMT_REP_REGISTER,
-		Paras: para,
-	}
+		para := []*Report.Param{
+			&Report.Param{
+				Type:  Report.Param_UINT8,
+				Npara: 0,
+			},
+			&Report.Param{
+				Type:  Report.Param_UINT64,
+				Npara: plc_id,
+			},
+		}
+		command_rep := &Report.ManageCommand{
+			Type:  Report.ManageCommand_CMT_REP_REGISTER,
+			Paras: para,
+		}
 
-	data, _ := proto.Marshal(command_rep)
-	s.CollectSend(&ZmqSendValue{
-		SocketType:         SOCKET_TERMINAL_MANAGE_DOWN_REGISTER,
-		SocketValue:        string(data),
-		Uuid:               uuid,
-		Tid:                tid,
-		WorkerConnectionID: worker_connection_id,
-	})
+		data, _ := proto.Marshal(command_rep)
+		s.CollectSend(&ZmqSendValue{
+			SocketType:         SOCKET_TERMINAL_MANAGE_DOWN_REGISTER,
+			SocketValue:        string(data),
+			Uuid:               uuid,
+			Tid:                tid,
+			WorkerConnectionID: worker_connection_id,
+		})
+	}
 	//s.Socket_Terminal_Manage_Down_Socket.Send(string(data), 0)
 }
 
