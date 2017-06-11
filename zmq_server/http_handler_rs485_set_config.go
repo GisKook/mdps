@@ -21,6 +21,7 @@ type Rs485SetConfig struct {
 }
 
 func Rs485SetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var rs485_set_cnfig Rs485SetConfig

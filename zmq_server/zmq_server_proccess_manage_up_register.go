@@ -6,14 +6,11 @@ import (
 	"github.com/giskook/mdps/pb"
 	"github.com/golang/protobuf/proto"
 	//zmq "github.com/pebbe/zmq4"
-	"log"
 	"strconv"
 )
 
 func (s *ZmqServer) Do(cpuid string, uuid string, tid string, worker_connection_id string) {
 	plc_id := db_socket.GetDBSocket().GetPlcID(cpuid)
-	log.Println("get plc_id ")
-	log.Println(plc_id)
 	if plc_id != 0 {
 
 		para := []*Report.Param{

@@ -110,7 +110,6 @@ func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte, _index int, rou
 		key := string(raw[index])
 		if key == MONITOR_TIMESTAMP {
 			time_stamp, _ := strconv.ParseInt(string(raw[index+1]), 10, 64)
-			log.Println(time_stamp)
 			router_monitor.TimeStamp = time_stamp
 		} else {
 			modbus_datatype_datalen := strings.Split(key, MONITOR_VALUE_SEP)
@@ -128,8 +127,6 @@ func (socket *RedisSocket) PipelineSetMonitorValue(raw [][]byte, _index int, rou
 		index += 2
 	}
 
-	log.Println(time.Now().Unix())
-	log.Println(conf.GetConf().Redis.ExpiredThreshold)
 	if router_monitor.TimeStamp < time.Now().Unix()-int64(conf.GetConf().Redis.ExpiredThreshold) {
 		return nil, base.Error_Redis_Monitor_Expired
 	}

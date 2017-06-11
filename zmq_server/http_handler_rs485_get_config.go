@@ -49,6 +49,7 @@ func EncodeRs485GetConfigResponse(response *Report.ControlCommand) string {
 }
 
 func Rs485GetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var rs485_get_config Rs485GetConfig

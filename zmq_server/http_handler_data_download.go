@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"time"
 )
@@ -22,7 +21,7 @@ type DataDownload struct {
 }
 
 func DataDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("DataDownloadHandler")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var data_download DataDownload

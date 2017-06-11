@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"time"
 )
@@ -27,7 +26,7 @@ func CheckParamtersReleaseTransparentTransmissionAddrErr(release_release_transpa
 }
 
 func ReleaseTransparentTransmissionHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("ReleaseTransparentTransmission")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var release_transparent_transmission ReleaseTransparentTransmission
@@ -56,7 +55,6 @@ func ReleaseTransparentTransmissionHandler(w http.ResponseWriter, r *http.Reques
 		},
 	}
 
-	log.Println(paras)
 	_serial := uint32(GetHttpServer().SetSerialID(*release_transparent_transmission.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",

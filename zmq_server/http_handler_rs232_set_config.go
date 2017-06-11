@@ -25,7 +25,7 @@ type Rs232SetConfig struct {
 }
 
 func Rs232SetConfigHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Rs232SetConfig")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var rs232_set_cnfig Rs232SetConfig

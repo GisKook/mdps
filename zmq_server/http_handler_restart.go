@@ -15,6 +15,7 @@ func RestartHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, EncodingGeneralResponse(HTTP_RESPONSE_RESULT_SERVER_FAILED))
 		}
 	}()
+	PrintRequest(r)
 
 	r.ParseForm()
 	if !CheckParamters(r, HTTP_PLC_ID, HTTP_PLC_SERIAL, HTTP_RESTART_DELAY) {

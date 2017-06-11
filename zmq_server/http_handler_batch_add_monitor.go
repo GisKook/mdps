@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"time"
 )
@@ -53,7 +52,7 @@ func CheckParamtersBatchAddMonitorErr(batch_add_monitor *BatchAddMonitor) bool {
 }
 
 func BatchAddMonitorHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("BatchAddMonitorHandler")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var batch_add_monitor BatchAddMonitor

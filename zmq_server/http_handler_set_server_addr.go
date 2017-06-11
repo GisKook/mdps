@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"time"
 )
@@ -47,7 +46,7 @@ func CheckParamtersSetServerAddrErr(server_addrs *SetServer_Addr) bool {
 }
 
 func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("SetServerAddrHandler")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var set_server_addr SetServer_Addr
@@ -94,7 +93,6 @@ func SetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
 			Npara: uint64(*server.Port),
 		})
 	}
-	log.Println(paras)
 	_serial := uint32(GetHttpServer().SetSerialID(*set_server_addr.Serial))
 	req := &Report.ControlCommand{
 		Uuid:         "das",

@@ -12,7 +12,6 @@ func (socket *RedisSocket) LoadAll() {
 	conn := socket.GetConn()
 	defer func() {
 		conn.Close()
-		log.Println("end proccess router")
 	}()
 	var value interface{}
 	var cursor_keys []interface{}

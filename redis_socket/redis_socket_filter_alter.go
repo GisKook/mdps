@@ -3,12 +3,10 @@ package redis_socket
 import (
 	"github.com/giskook/mdps/base"
 	"github.com/giskook/mdps/pb"
-	"log"
 )
 
 func (socket *RedisSocket) FilterAlters(alters []*Report.DataCommand, alters_redis []*base.RouterAlterRedis) []*base.RouterAlter {
 	if len(alters) != len(alters_redis) {
-		log.Println("FilterAlters alters not equal")
 		return nil
 	}
 

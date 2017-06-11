@@ -55,6 +55,7 @@ func EncodeRs232GetConfigResponse(response *Report.ControlCommand) string {
 }
 
 func Rs232GetConfigHandler(w http.ResponseWriter, r *http.Request) {
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var rs232_get_config Rs232GetConfig

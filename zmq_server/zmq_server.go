@@ -115,7 +115,6 @@ func (s *ZmqServer) RecvDataUp() {
 }
 
 func (s *ZmqServer) CollectSend(value *ZmqSendValue) {
-	log.Println("CollectSend")
 	s.SendChan <- value
 }
 

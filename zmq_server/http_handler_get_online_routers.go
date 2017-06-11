@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/giskook/mdps/redis_socket"
-	"log"
 	"net/http"
 )
 
@@ -27,7 +26,7 @@ func GetOnlineRoutersHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}()
-	log.Println("GetOnlineRouters")
+	PrintRequest(r)
 
 	res := &GetOnlineRoutersResponse{
 		Result: 0,

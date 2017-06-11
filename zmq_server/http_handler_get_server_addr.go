@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
-	"log"
 	"net/http"
 	"time"
 )
@@ -48,7 +47,7 @@ func EncodeGetServerAddrResponse(response *Report.ControlCommand) string {
 }
 
 func GetServerAddrHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("GetServerAddrHandler")
+	PrintRequest(r)
 	r.ParseForm()
 	decoder := json.NewDecoder(r.Body)
 	var get_server_addr GetServerAddr

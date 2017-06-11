@@ -2,7 +2,9 @@ package zmq_server
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"strconv"
 	"sync/atomic"
 )
@@ -63,4 +65,14 @@ func EncodingGeneralResponse(result uint8) string {
 	response, _ := json.Marshal(general_response)
 
 	return string(response)
+}
+
+func PrintRequest(r *http.Request) {
+	v, e := httputil.DumpRequest(r, true)
+	if e != nil {
+		log.Println(e.Error())
+		return
+	}
+	log.Println(string(v))
+
 }
