@@ -100,7 +100,9 @@ func (socket *RedisSocket) DoWork() {
 		case p := <-socket.Terminal_Status_Chan:
 			socket.Mutex_Terminal_Status.Lock()
 			socket.Terminal_Status = append(socket.Terminal_Status, p)
-			GetStatusChecker().Insert(p.Tid, time.Now().Unix())
+			if p.Status != 1 {
+				GetStatusChecker().Insert(p.Tid, time.Now().Unix())
+			}
 			socket.Mutex_Terminal_Status.Unlock()
 		}
 	}

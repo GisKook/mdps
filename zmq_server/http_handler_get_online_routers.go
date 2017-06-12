@@ -26,7 +26,7 @@ func GetOnlineRoutersHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}()
-	PrintRequest(r)
+	//PrintRequest(r)
 
 	res := &GetOnlineRoutersResponse{
 		Result: 0,
