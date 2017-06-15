@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+const (
+	TERMINAL_STATUS_ONLINE  uint8 = 0
+	TERMINAL_STATUS_OFFLINE uint8 = 1
+	TERMINAL_STATUS_TT      uint8 = 2
+	TERMINAL_STATUS_KEEP    uint8 = 3
+)
+
 type TStatus struct {
 	Uuid      string
 	Tid       uint64
@@ -99,8 +106,10 @@ func (socket *RedisSocket) DoWork() {
 			go GetStatusChecker().Check()
 		case p := <-socket.Terminal_Status_Chan:
 			socket.Mutex_Terminal_Status.Lock()
-			socket.Terminal_Status = append(socket.Terminal_Status, p)
-			if p.Status != 1 {
+			if p.Status != TERMINAL_STATUS_KEEP {
+				socket.Terminal_Status = append(socket.Terminal_Status, p)
+			}
+			if p.Status != TERMINAL_STATUS_OFFLINE {
 				GetStatusChecker().Insert(p.Tid, time.Now().Unix())
 			}
 			socket.Mutex_Terminal_Status.Unlock()
@@ -136,6 +145,6 @@ func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {
 func (socket *RedisSocket) UpdateStatus(tid uint64) {
 	socket.RecvZmqStatus(&TStatus{
 		Tid:    tid,
-		Status: 0,
+		Status: TERMINAL_STATUS_KEEP,
 	})
 }

@@ -191,7 +191,7 @@ func (sc *Status_Checker) Check() {
 				for _, tid := range tids {
 					GetRedisSocket().Terminal_Status_Chan <- &TStatus{
 						Tid:    tid,
-						Status: 1,
+						Status: TERMINAL_STATUS_OFFLINE,
 					}
 				}
 
