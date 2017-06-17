@@ -111,15 +111,29 @@ cmd:
 		data_type := uint8((*Report.ControlCommand)(res).Paras[1].Npara)
 		data_len := uint8((*Report.ControlCommand)(res).Paras[2].Npara)
 		data := (*Report.ControlCommand)(res).Paras[3].Bpara
-		data_base64 := base64.StdEncoding.EncodeToString(data)
+		modbus_addr := uint16((*Report.ControlCommand)(res).Paras[4].Npara)
+		var data_query_response *DataQueryResponse
+		if modbus_addr == 0xffff {
+			data_query_response = &DataQueryResponse{
+				Result: HTTP_RESPONSE_RESULT_DATA_QUERY_NOT_MATCH,
+				Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_DATA_QUERY_NOT_MATCH],
+			}
+		} else if data_type == 0xff {
+			data_query_response = &DataQueryResponse{
+				Result: HTTP_RESPONSE_RESULT_DATA_QUERY_NO_MODBUS_ADDR,
+				Desc:   HTTP_RESULT[HTTP_RESPONSE_RESULT_DATA_QUERY_NO_MODBUS_ADDR],
+			}
+		} else {
+			data_base64 := base64.StdEncoding.EncodeToString(data)
 
-		data_query_response := &DataQueryResponse{
-			Result:     HTTP_RESPONSE_RESULT_SUCCESS,
-			Desc:       HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS],
-			SerialPort: serial_port,
-			Datatype:   data_type,
-			DataLen:    data_len,
-			Data:       data_base64,
+			data_query_response = &DataQueryResponse{
+				Result:     HTTP_RESPONSE_RESULT_SUCCESS,
+				Desc:       HTTP_RESULT[HTTP_RESPONSE_RESULT_SUCCESS],
+				SerialPort: serial_port,
+				Datatype:   data_type,
+				DataLen:    data_len,
+				Data:       data_base64,
+			}
 		}
 		fmt.Fprint(w, EncodingDataQueryResponse(data_query_response))
 		GetHttpServer().DelRequest(chan_key)
