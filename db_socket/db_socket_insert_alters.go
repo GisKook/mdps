@@ -38,11 +38,31 @@ func (socket *DbSocket) InsertAlters(router_alter []*base.RouterAlter) {
 			return
 		}
 	}
+	router_done := make([]*base.RouterAlter, 0)
+	check_exist := func(done []*base.RouterAlter, todo *base.RouterAlter) bool {
+		for _, v := range done {
+			if v.RouterID == todo.RouterID &&
+				v.SerialPort == todo.SerialPort &&
+				v.ModbusAddr == todo.ModbusAddr &&
+				v.DataType == todo.DataType &&
+				v.DataLen == todo.DataLen &&
+				v.Status == todo.Status &&
+				v.DataTypeDB == todo.DataTypeDB &&
+				v.AlterIDDB == todo.AlterIDDB {
+				return true
+			}
+		}
+
+		return false
+	}
+
 	for _, v := range router_alter {
-		insert_sql := FmtInsertAlterSQL(table_name, v)
-		log.Println(insert_sql)
-		_, err = tx.Exec(insert_sql)
-		base.CheckError(err)
+		if !check_exist(router_done, v) {
+			insert_sql := FmtInsertAlterSQL(table_name, v)
+			log.Println(insert_sql)
+			_, err = tx.Exec(insert_sql)
+			base.CheckError(err)
+		}
 
 	}
 	err = tx.Commit()
