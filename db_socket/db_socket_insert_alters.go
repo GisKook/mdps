@@ -14,13 +14,32 @@ const (
 	TRANS_TABLE_ALTER_NAME_FMT string = "DMS_DAP_ALTER_200601"
 	SQL_INSERT_ALTER_TABLE_EX  string = "INSERT %s (ALERT_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, STATUS) VALUES(%d, %d, %d, %d, %d, %d)"
 	SQL_INSERT_ALTER_TABLE     string = "INSERT %s (ALERT_ID, DATATYPE, DATA, ADDRESS, STATUS) VALUES(%d, %d, %s, %d, %d)"
+	SQL_CREATE_ALTER_TABLE_FMT string = "CREATE TABLE %d ( \"ID\" int(11) NOT NULL AUTO_INCREMENT, \"ALERT_ID\" int(11) NOT NULL, \"DATATYPE\" int(11) NOT NULL, \"INTBITS\" int(11) DEFAULT NULL, \"DECIMALBITS\" int(11) DEFAULT NULL, \"ADDRESS\" int(11) NOT NULL, \"TIMESTAMP\" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \"isread\" int(11) DEFAULT '0', \"DATA\" varchar(8) DEFAULT NULL, \"STATUS\" int(11) DEFAULT NULL, PRIMARY KEY (\"ID\"), KEY \"ALERT_ID\" (\"ALERT_ID\")) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;"
 )
+
+func (socket *DbSocket) create_alter_table(table_name string) bool {
+	sql_create_alter_table := fmt.Sprintf(SQL_CREATE_ALTER_TABLE_FMT, table_name)
+	log.Println(sql_create_alter_table)
+	_, err := socket.DbSocket.Exec(sql_create_alter_table)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
 
 func (socket *DbSocket) InsertAlters(router_alter []*base.RouterAlter) {
 	tx, err := socket.Db.Begin()
 	base.CheckError(err)
+	table_name := GetAlterTableName(time.Now().Unix())
+	if !socket.check_table_if_exist(table_name) {
+		if !socket.create_alter_table(table_name) {
+			return
+		}
+	}
 	for _, v := range router_alter {
-		insert_sql := FmtInsertAlterSQL(v)
+		insert_sql := FmtInsertAlterSQL(table_name, v)
 		log.Println(insert_sql)
 		_, err = tx.Exec(insert_sql)
 		base.CheckError(err)
@@ -164,10 +183,8 @@ func FmtInsertAlterSQLEx(router *base.RouterAlter, value *base.Variant) string {
 	return insert_sql
 }
 
-func FmtInsertAlterSQL(router *base.RouterAlter) string {
-	time_stamp := time.Now().Unix()
-
-	insert_sql := fmt.Sprintf(SQL_INSERT_ALTER_TABLE, GetAlterTableName(time_stamp), router.AlterIDDB, router.DataTypeDB, base.GetString(router.Data), router.ModbusAddr, router.Status)
+func FmtInsertAlterSQL(table_name string, router *base.RouterAlter) (string, string) {
+	insert_sql := fmt.Sprintf(SQL_INSERT_ALTER_TABLE, table_name, router.AlterIDDB, router.DataTypeDB, base.GetString(router.Data), router.ModbusAddr, router.Status)
 
 	return insert_sql
 }
