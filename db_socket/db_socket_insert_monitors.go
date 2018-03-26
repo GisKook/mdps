@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	TRANS_TABLE_NAME_FMT        string = "DMS_DMP_MONITOR_200601"
-	SQL_INSERT_MONITOR_TABLE_EX string = "INSERT %s (MONITOR_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, TIMESTAMP) VALUES(%d, %d, %d, %d, %d, '%s')"
-	SQL_INSERT_MONITOR_TABLE    string = "INSERT %s (MONITOR_ID, DATATYPE, DATA, ADDRESS, TIMESTAMP) VALUES(%d, %d, %s, %d, '%s')"
+	TRANS_TABLE_NAME_FMT         string = "DMS_DMP_MONITOR_200601"
+	SQL_INSERT_MONITOR_TABLE_EX  string = "INSERT %s (MONITOR_ID, DATATYPE, INTBITS, DECIMALBITS, ADDRESS, TIMESTAMP) VALUES(%d, %d, %d, %d, %d, '%s')"
+	SQL_INSERT_MONITOR_TABLE     string = "INSERT %s (MONITOR_ID, DATATYPE, DATA, ADDRESS, TIMESTAMP) VALUES(%d, %d, %s, %d, '%s')"
+	SQL_CREATE_MONITOR_TABLE_FMT string = "CREATE TABLE %s ( ID int(11) NOT NULL AUTO_INCREMENT, MONITOR_ID int(11) NOT NULL, DATATYPE int(11) NOT NULL, INTBITS int(11) DEFAULT NULL, DECIMALBITS int(11) DEFAULT NULL, ADDRESS int(11) NOT NULL, TIMESTAMP timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, isread int(11) DEFAULT '0', DATA varchar(8) DEFAULT NULL,  PRIMARY KEY (ID) ) "
 )
 
 func (socket *DbSocket) InsertMonitorsEx(router_db []*base.RouterMonitorDB, router_redis []*base.RouterMonitor) {
@@ -39,6 +40,12 @@ func (socket *DbSocket) InsertMonitorsEx(router_db []*base.RouterMonitorDB, rout
 func (socket *DbSocket) InsertMonitors(router_db []*base.RouterMonitorDB, router_redis []*base.RouterMonitor) {
 	tx, err := socket.Db.Begin()
 	base.CheckError(err)
+	table_name := GetMonitorTableName(time.Now().Unix())
+	if !socket.check_table_if_exist(table_name) {
+		if !socket.create_alter_table(table_name) {
+			return
+		}
+	}
 	for _, v := range router_db {
 		router_monitor_single, time_stamp := socket.GetValues(router_redis, v)
 		if router_monitor_single != nil {
@@ -188,4 +195,14 @@ func FmtSQL(monitor_db *base.RouterMonitorDB, monitor_redis *base.RouterMonitorS
 	insert_sql := fmt.Sprintf(SQL_INSERT_MONITOR_TABLE, GetTableName(time_stamp), monitor_db.MonitorID, monitor_db.Datatype, base.GetString(monitor_redis.Data), monitor_db.ModbusAddr, GetTime(time_stamp))
 
 	return insert_sql
+}
+
+func GetMonitorTableName(t int64) string {
+	if t == 0 {
+		t = time.Now().Unix()
+	}
+
+	_t := time.Unix(int64(t), 0)
+
+	return _t.Format(TRANS_TABLE_NAME_FMT)
 }
