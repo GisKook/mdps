@@ -54,6 +54,7 @@ type RouterAlterRedis struct {
 }
 
 type RouterAlter struct {
+	MachineID  string
 	RouterID   uint64
 	SerialPort uint8
 	ModbusAddr uint32

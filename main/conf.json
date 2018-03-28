@@ -13,10 +13,10 @@
     },
 
     "Redis": {
-        "Addr": "127.0.0.1:6666",
+        "Addr": "127.0.0.1:6379",
         "MaxIdle":100,
         "IdleTimeOut":240,
-        "Passwd":"Router@@170331*!",
+        "Passwd":"redis",
         "TranInterval":5,
         "MonitorsKeyExpire":20,
         "AltersKeyExpire":20,
@@ -29,9 +29,9 @@
 
     "DB":{ 
         "Host":"127.0.0.1",
-        "Port":"3306",
-        "User":"dms",
-        "Passwd":"dms888A!",
+        "Port":"8079",
+        "User":"root",
+        "Passwd":"Mysql@123",
         "DbName":"dms"
     }
 }

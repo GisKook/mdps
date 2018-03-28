@@ -23,6 +23,7 @@ func (socket *RedisSocket) ProccessDataUploadAlters() {
 			alter_key := socket.GenAlterKey(data_command)
 			conn.Send("DEL", alter_key)
 			conn.Send("EXPIRE", alter_key)
+
 			for _, alter := range data_command.Alters {
 				if alter.DataType == 0 {
 					conn.Send("HMSET",
