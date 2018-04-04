@@ -103,6 +103,12 @@ const (
 	// query rouer status
 	HTTP_QUERY_ROUTER_STATUS string = "/plc/query_router_status"
 
+	// get paramters
+	HTTP_GET_PARAMTERS string = "/plc/get_link_paramters"
+
+	// get paramters
+	HTTP_SET_PARAMTERS string = "/plc/set_link_paramters"
+
 	//////////////RESPONSE////////////////
 	//HTTP_RESPONSE_RESULT               string = "result"
 	HTTP_RESPONSE_RESULT_SUCCESS uint8 = 0

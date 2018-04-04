@@ -54,6 +54,8 @@ func (server *Http_server) Init() {
 	http.HandleFunc(HTTP_RS232_SET_CONFIG, Rs232SetConfigHandler)
 	http.HandleFunc(HTTP_RS485_GET_CONFIG, Rs485GetConfigHandler)
 	http.HandleFunc(HTTP_RS485_SET_CONFIG, Rs485SetConfigHandler)
+	http.HandleFunc(HTTP_GET_PARAMTERS, GetParamtersHandler)
+	http.HandleFunc(HTTP_SET_PARAMTERS, SetParamtersHandler)
 
 	http.HandleFunc(HTTP_TRANSPARENT_TRANSMISSION, TransparentTransmissionHandler)
 	http.HandleFunc(HTTP_RELEASE_TRANSPARENT_TRANSMISSION, ReleaseTransparentTransmissionHandler)

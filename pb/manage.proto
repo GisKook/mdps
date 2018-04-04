@@ -15,8 +15,8 @@ message ManageCommand {
 		CMT_REP_REGISTER        = 0x8001;
 		CMT_REP_LOGIN           = 0x8002;
 
-        // das->dps
-        CMT_REP_HEART           = 0x8003;
+		// das->dps
+		CMT_REP_HEART           = 0x8003;
 
 	}
 	bytes   cpuid = 1;

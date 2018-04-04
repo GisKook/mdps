@@ -18,7 +18,7 @@ import (
 )
 
 func check_auth() bool {
-	if time.Now().Unix() > 1522511999 {
+	if time.Now().Unix() > 1525103999 {
 		return false
 	}
 	return true
