@@ -3,14 +3,18 @@ package redis_socket
 import (
 	"github.com/giskook/mdps/base"
 	"github.com/giskook/mdps/pb"
+	"log"
 )
 
 func (socket *RedisSocket) FilterAlters(alters []*Report.DataCommand, alters_redis []*base.RouterAlterRedis) []*base.RouterAlter {
-	if len(alters) != len(alters_redis) {
+	report_alters := len(alters)
+	if report_alters != len(alters_redis) || report_alters == 0 {
+		log.Println("filteralters return nil")
 		return nil
 	}
 
 	alter := make([]*base.RouterAlter, 0)
+
 	for i, v := range alters {
 		alter = append(alter, CompareAlter(v, alters_redis[i].Alters, v.Tid, uint8(v.SerialPort))...)
 	}
@@ -28,21 +32,19 @@ func CompareAlter(data_command *Report.DataCommand, alter_redis []*base.Alter, r
 				a.DataType == uint32(b.DataType) &&
 				a.DataLen == uint32(b.DataLen) &&
 				a.Status != uint32(b.Status) {
-				alert_len := len(alter)
-				if !(alert_len > 0 &&
-					alter[alert_len-1].ModbusAddr == b.ModbusAddr &&
-					alter[alert_len-1].DataType == b.DataType &&
-					alter[alert_len-1].Status == b.Status) {
-
-					alter = append(alter, &base.RouterAlter{
-						RouterID:   router_id,
-						SerialPort: serial_port,
-						ModbusAddr: b.ModbusAddr,
-						DataType:   b.DataType,
-						Data:       b.Data,
-						Status:     b.Status,
-					})
-				}
+				alter = append(alter, &base.RouterAlter{
+					RouterID:   router_id,
+					SerialPort: serial_port,
+					ModbusAddr: a.ModusAddr,
+					DataType:   uint8(a.DataType),
+					Data:       a.Data,
+					Status:     uint8(a.Status),
+					//					ModbusAddr: b.ModbusAddr,
+					//					DataType:   b.DataType,
+					//					Data:       b.Data,
+					//					Status:     b.Status,
+					TimeStamp: a.Timestamp,
+				})
 			}
 		}
 	}

@@ -16,6 +16,7 @@ message Alter{
 	uint32 data_len = 4;
 	bytes data = 5;
 	uint32 status = 6; 
+	int64 timestamp = 7;
 }
 
 message DataCommand {

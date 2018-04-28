@@ -62,6 +62,9 @@ type RouterAlter struct {
 	DataLen    uint8
 	Data       []byte
 	Status     uint8
+	TimeStamp  int64
+	Name       string
+	Remark     string
 
 	DataTypeDB uint8
 	AlterIDDB  uint32
