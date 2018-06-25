@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/giskook/mdps/conf"
 	"github.com/giskook/mdps/pb"
+	"log"
 	"net/http"
 	"time"
 )
@@ -60,6 +61,7 @@ func TransparentTransmissionHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	log.Println(*transparent_transmission.Server_Addr)
 	paras := []*Report.Param{
 		&Report.Param{
 			Type:  Report.Param_UINT8,

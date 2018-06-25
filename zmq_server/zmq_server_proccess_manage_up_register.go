@@ -9,14 +9,16 @@ import (
 	"strconv"
 )
 
-func (s *ZmqServer) Do(cpuid string, uuid string, tid string, worker_connection_id string) {
+func (s *ZmqServer) Do(cpuid string, uuid string, tid string, worker_connection_id string, _tid uint64) {
 	plc_id := db_socket.GetDBSocket().GetPlcID(cpuid)
 	if plc_id != 0 {
 
 		para := []*Report.Param{
 			&Report.Param{
-				Type:  Report.Param_UINT8,
-				Npara: 0,
+				//			Type:  Report.Param_UINT8,
+				//			Npara: 0,
+				Type:  Report.Param_UINT64,
+				Npara: _tid,
 			},
 			&Report.Param{
 				Type:  Report.Param_UINT64,
@@ -46,5 +48,5 @@ func (s *ZmqServer) ProccessManageUpRegister(command *Report.ManageCommand) {
 	w_c_id := command.Paras[0].Npara*100000 + command.Paras[1].Npara
 	s_tid := strconv.FormatUint(tid, 10)
 	s_w_c_id := strconv.FormatUint(w_c_id, 10)
-	go s.Do(base.GetString(command.Cpuid)[0:], uuid, s_tid, s_w_c_id)
+	go s.Do(base.GetString(command.Cpuid)[0:], uuid, s_tid, s_w_c_id, tid)
 }

@@ -14,14 +14,15 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
-	"time"
+	//"time"
 )
 
 func check_auth() bool {
-	if time.Now().Unix() > 1525103999 {
-		return false
-	}
 	return true
+	//	if time.Now().Unix() > 1527782399 {
+	//		return false
+	//	}
+	//	return true
 }
 
 func main() {
