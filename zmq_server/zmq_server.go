@@ -143,6 +143,7 @@ func (s *ZmqServer) ProccessSend() {
 				s.Socket_Terminal_Manage_Down_Socket.Send(p.Tid, zmq.SNDMORE)
 				s.Socket_Terminal_Manage_Down_Socket.Send(p.WorkerConnectionID, zmq.SNDMORE)
 				s.Socket_Terminal_Manage_Down_Socket.Send(p.SocketValue, 0)
+				log.Println("<INF> send to das")
 			} else if p.SocketType == SOCKET_TERMINAL_MANAGE_DOWN_LOGIN {
 				s.SendFeedbackLogin(p.SocketValueLogin)
 			}

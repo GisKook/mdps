@@ -144,7 +144,8 @@ func (socket *RedisSocket) RecvZmqStatus(status *TStatus) {
 
 func (socket *RedisSocket) UpdateStatus(tid uint64) {
 	socket.RecvZmqStatus(&TStatus{
-		Tid:    tid,
-		Status: TERMINAL_STATUS_KEEP,
+		Tid: tid,
+		//	Status: TERMINAL_STATUS_KEEP,
+		Status: TERMINAL_STATUS_ONLINE,
 	})
 }
